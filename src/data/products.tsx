@@ -3,11 +3,15 @@ export const products = [
   {
     id: "1",
     name: "Organic Baby Care Essential Kit",
-    price: 52.99,
+    price: 19.99,
     rating: 4.9,
     reviews: 123,
     image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&h=400&fit=crop",
-    sustainabilityScore: 95,
+    images: [
+      "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=400&h=400&fit=crop"
+    ],
     certifications: ["USDA Organic", "Hypoallergenic"],
     carbonFootprint: "1.1kg CO₂ saved",
     isNew: true,
@@ -19,12 +23,16 @@ export const products = [
   {
     id: "2",
     name: "Sustainable Wooden Building Blocks",
-    price: 34.99,
-    originalPrice: 49.99,
+    price: 14.99,
+    originalPrice: 19.99,
     rating: 4.7,
     reviews: 89,
     image: "https://images.unsplash.com/photo-1558877385-4debf23bb110?w=400&h=400&fit=crop",
-    sustainabilityScore: 90,
+    images: [
+      "https://images.unsplash.com/photo-1558877385-4debf23bb110?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1501286353178-1ec881214838?w=400&h=400&fit=crop"
+    ],
     certifications: ["FSC Certified", "Non-Toxic Paint"],
     carbonFootprint: "1.8kg CO₂ saved",
     isNew: false,
@@ -36,11 +44,15 @@ export const products = [
   {
     id: "3",
     name: "Organic Pet Food - Chicken & Rice",
-    price: 28.99,
+    price: 12.99,
     rating: 4.6,
     reviews: 234,
     image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop",
-    sustainabilityScore: 88,
+    images: [
+      "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=400&fit=crop"
+    ],
     certifications: ["USDA Organic", "Grain-Free"],
     carbonFootprint: "2.2kg CO₂ saved",
     isNew: false,
@@ -54,12 +66,16 @@ export const products = [
   {
     id: "4",
     name: "Natural Vitamin C Serum",
-    price: 39.99,
-    originalPrice: 54.99,
+    price: 15.99,
+    originalPrice: 22.99,
     rating: 4.8,
     reviews: 456,
     image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
-    sustainabilityScore: 92,
+    images: [
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400&h=400&fit=crop"
+    ],
     certifications: ["Organic", "Cruelty-Free", "Vegan"],
     carbonFootprint: "0.8kg CO₂ saved",
     isNew: true,
@@ -71,11 +87,15 @@ export const products = [
   {
     id: "5",
     name: "Refillable Lipstick Set",
-    price: 42.00,
+    price: 16.99,
     rating: 4.5,
     reviews: 178,
     image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&h=400&fit=crop",
-    sustainabilityScore: 87,
+    images: [
+      "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400&h=400&fit=crop"
+    ],
     certifications: ["Refillable", "Natural Colors"],
     carbonFootprint: "1.2kg CO₂ saved",
     isNew: false,
@@ -91,7 +111,6 @@ export const products = [
     rating: 4.7,
     reviews: 445,
     image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
-    sustainabilityScore: 94,
     certifications: ["Cruelty-Free", "Vegan", "Plastic-Free"],
     carbonFootprint: "0.3kg CO₂ saved",
     isNew: false,
@@ -110,7 +129,7 @@ export const products = [
     rating: 4.6,
     reviews: 267,
     image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop",
-    sustainabilityScore: 85,
+    
     certifications: ["100% Recycled", "PFOA-Free"],
     carbonFootprint: "3.5kg CO₂ saved",
     isNew: false,
@@ -126,7 +145,7 @@ export const products = [
     rating: 4.4,
     reviews: 198,
     image: "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400&h=400&fit=crop",
-    sustainabilityScore: 91,
+    
     certifications: ["Biodegradable", "Plant-Based"],
     carbonFootprint: "0.6kg CO₂ saved",
     isNew: true,
@@ -142,7 +161,7 @@ export const products = [
     rating: 4.8,
     reviews: 156,
     image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=400&fit=crop",
-    sustainabilityScore: 89,
+    
     certifications: ["GOTS Certified", "Fair Trade"],
     carbonFootprint: "2.1kg CO₂ saved",
     isNew: false,
@@ -160,7 +179,7 @@ export const products = [
     rating: 4.7,
     reviews: 334,
     image: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=400&h=400&fit=crop",
-    sustainabilityScore: 94,
+    
     certifications: ["Biodegradable", "Plastic-Free"],
     carbonFootprint: "0.4kg CO₂ saved",
     isNew: false,
@@ -176,7 +195,7 @@ export const products = [
     rating: 4.5,
     reviews: 289,
     image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
-    sustainabilityScore: 92,
+    
     certifications: ["Plastic-Free", "Natural Ingredients"],
     carbonFootprint: "0.7kg CO₂ saved",
     isNew: true,
@@ -193,7 +212,6 @@ export const products = [
     rating: 4.6,
     reviews: 145,
     image: "https://images.unsplash.com/photo-1584622781564-1d0b4c8ac2d1?w=400&h=400&fit=crop",
-    sustainabilityScore: 88,
     certifications: ["WaterSense", "Chrome-Free"],
     carbonFootprint: "12.5kg CO₂ saved annually",
     isNew: false,
@@ -207,12 +225,16 @@ export const products = [
   {
     id: "13",
     name: "Eco-Friendly Bamboo Water Bottle",
-    price: 24.99,
-    originalPrice: 34.99,
+    price: 9.99,
+    originalPrice: 14.99,
     rating: 4.8,
     reviews: 156,
     image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=400&fit=crop",
-    sustainabilityScore: 95,
+    images: [
+      "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop"
+    ],
     certifications: ["BPA-Free", "FSC Certified", "Carbon Neutral"],
     carbonFootprint: "2.5kg CO₂ saved",
     isNew: true,
@@ -223,11 +245,15 @@ export const products = [
   {
     id: "14",
     name: "Organic Cotton Tote Bag",
-    price: 18.99,
+    price: 7.99,
     rating: 4.6,
     reviews: 89,
     image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
-    sustainabilityScore: 88,
+    images: [
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=400&h=400&fit=crop"
+    ],
     certifications: ["GOTS Certified", "Fair Trade"],
     carbonFootprint: "1.8kg CO₂ saved",
     isNew: false,

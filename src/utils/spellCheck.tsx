@@ -1,11 +1,16 @@
 
+// Import products for search suggestions
+import { products } from '@/data/products';
+
 const productNames = [
   'bamboo', 'water', 'bottle', 'organic', 'cotton', 'tote', 'bag', 'eco', 'friendly',
   'sustainable', 'reusable', 'biodegradable', 'solar', 'panel', 'charger', 'hemp',
   'backpack', 'recycled', 'aluminum', 'lunch', 'box', 'glass', 'straw', 'set',
   'compost', 'bin', 'natural', 'soap', 'shampoo', 'toothbrush', 'yoga', 'mat',
   'cork', 'notebook', 'beeswax', 'wrap', 'wooden', 'utensils', 'cleaning',
-  'products', 'skincare', 'cosmetics', 'candles', 'clothing', 'shoes', 'accessories'
+  'products', 'skincare', 'cosmetics', 'candles', 'clothing', 'shoes', 'accessories',
+  // Add actual product names
+  ...products.map(p => p.name.toLowerCase().split(' ')).flat()
 ];
 
 function levenshteinDistance(str1: string, str2: string): number {
@@ -40,6 +45,17 @@ export function getSpellingSuggestions(query: string): string[] {
   const words = query.toLowerCase().split(' ');
   const suggestions: string[] = [];
   
+  // Direct product name matches first
+  const directMatches = products
+    .filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
+    .slice(0, 3)
+    .map(p => p.name);
+  
+  if (directMatches.length > 0) {
+    return directMatches;
+  }
+  
+  // Then spelling suggestions
   words.forEach(word => {
     if (word.length > 2) {
       const bestMatches = productNames

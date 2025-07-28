@@ -8,16 +8,11 @@ import CommunityEcoChallenges from '@/components/CommunityEcoChallenges';
 import CarbonOffsetMarketplace from '@/components/CarbonOffsetMarketplace';
 import SustainabilityCalculator from '@/components/SustainabilityCalculator';
 import LocalEcoDirectory from '@/components/LocalEcoDirectory';
-import SubscriptionEcoBoxes from '@/components/SubscriptionEcoBoxes';
+
 import { Sparkles, Target, Calculator, MapPin, Package, Coins, Users, Activity, Brain, Leaf } from 'lucide-react';
 
 const EcoFeatures = () => {
   const features = [
-    {
-      icon: <Brain className="h-8 w-8" />,
-      title: "AI-Powered Recommendations",
-      description: "Get personalized sustainability suggestions based on your lifestyle and preferences."
-    },
     {
       icon: <Activity className="h-8 w-8" />,
       title: "Real-time Impact Tracking",
@@ -43,12 +38,11 @@ const EcoFeatures = () => {
       title: "Local Eco-Business Directory",
       description: "Discover and support sustainable businesses in your local area."
     },
-    {
-      icon: <Package className="h-8 w-8" />,
-      title: "Subscription Eco-Boxes",
-      description: "Receive curated sustainable products delivered monthly to your door."
-    }
   ];
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-cream-50">
@@ -103,7 +97,11 @@ const EcoFeatures = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-sage-100">
+              <div 
+                key={index} 
+                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-sage-100 cursor-pointer"
+                onClick={scrollToTop}
+              >
                 <div className="p-3 bg-tree-50 rounded-lg w-fit mb-4 text-tree-600">
                   {feature.icon}
                 </div>
@@ -147,7 +145,6 @@ const EcoFeatures = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <LocalEcoDirectory />
-            <SubscriptionEcoBoxes />
           </div>
         </div>
       </section>

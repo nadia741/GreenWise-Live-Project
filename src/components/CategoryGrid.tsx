@@ -20,42 +20,42 @@ const CategoryGrid = () => {
   const categoryData = [
     {
       key: 'Kids & Pets',
-      icon: '👶',
+      icon: '🌸',
       title: 'Kids & Pets',
       description: 'Safe, sustainable products for your little ones and furry friends',
       count: getCategoryProductCount('Kids & Pets')
     },
     {
       key: 'Beauty & Personal Care',
-      icon: '💄',
+      icon: '💎',
       title: 'Beauty & Personal Care',
       description: 'Natural, refillable beauty products for conscious consumers',
       count: getCategoryProductCount('Beauty & Personal Care')
     },
     {
       key: 'Home & Kitchen',
-      icon: '🏠',
+      icon: '🏮',
       title: 'Home & Kitchen',
       description: 'Sustainable solutions for cooking, cleaning, and living',
       count: getCategoryProductCount('Home & Kitchen')
     },
     {
       key: 'Bathroom Essentials',
-      icon: '🚿',
+      icon: '🧘',
       title: 'Bathroom Essentials',
       description: 'Plastic-free alternatives for your daily bathroom routine',
       count: getCategoryProductCount('Bathroom Essentials')
     },
     {
       key: 'Drinkware',
-      icon: '🥤',
+      icon: '🌊',
       title: 'Drinkware',
       description: 'Sustainable bottles and cups for hydration on-the-go',
       count: products.filter(p => p.category === 'Drinkware').length
     },
     {
       key: 'Bags',
-      icon: '👜',
+      icon: '🌿',
       title: 'Bags & Accessories',
       description: 'Stylish bags made from sustainable materials',
       count: products.filter(p => p.category === 'Bags').length
@@ -102,37 +102,18 @@ const CategoryGrid = () => {
                   {category.description}
                 </p>
                 
-                <div className="text-forest-600 font-semibold text-sm">
-                  {category.count} products
-                </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        {/* Action Button */}
+        <div className="flex justify-center">
           <Button
             onClick={() => navigate('/products')}
             className="bg-forest-600 hover:bg-forest-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Browse All Products
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={() => navigate('/products?sort=sustainability')}
-            className="border-forest-300 text-forest-600 hover:bg-forest-50 px-6 py-3 rounded-lg font-medium transition-all duration-300"
-          >
-            Most Sustainable
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={() => navigate('/products?sort=bestsellers')}
-            className="border-forest-300 text-forest-600 hover:bg-forest-50 px-6 py-3 rounded-lg font-medium transition-all duration-300"
-          >
-            Bestsellers
           </Button>
         </div>
       </div>

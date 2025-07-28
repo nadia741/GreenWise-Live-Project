@@ -180,9 +180,6 @@ const Signup = () => {
               {errors.password && (
                 <p className="text-red-500 text-xs mt-1">{errors.password}</p>
               )}
-              <p className="text-xs text-sage-500 mt-1">
-                Password must be at least 8 characters with uppercase, lowercase, and number
-              </p>
             </div>
 
             <div>
@@ -216,16 +213,6 @@ const Signup = () => {
                 <p className="text-red-500 text-xs">{errors.terms}</p>
               )}
 
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="newsletter"
-                  checked={formData.newsletter}
-                  onCheckedChange={(checked) => handleInputChange('newsletter', checked as boolean)}
-                />
-                <Label htmlFor="newsletter" className="text-sm">
-                  Subscribe to our newsletter for eco-tips and exclusive offers
-                </Label>
-              </div>
             </div>
 
             <Button 

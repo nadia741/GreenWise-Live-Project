@@ -22,7 +22,6 @@ const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
   const { getCartItemsCount, getWishlistItemsCount } = useCart();
-  const { points: sustainabilityScore } = useRewards();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +52,6 @@ const Header = () => {
   };
 
   const navigationLinks = [
-    { href: '/', label: 'Home' },
     { href: '/products', label: 'Products' },
     { href: '/about', label: 'About' },
     { href: '/blog', label: 'Blog' },
@@ -102,12 +100,12 @@ const Header = () => {
                 placeholder="Search sustainable products..."
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-12 pr-4 py-3 w-full border-sage-200 focus:border-tree-400 rounded-xl bg-white/80 backdrop-blur-sm"
+                className="pl-12 pr-4 py-3 w-full border-2 border-tree-300 focus:border-tree-500 rounded-xl bg-white shadow-lg focus:shadow-xl transition-all duration-200"
               />
               <Button
                 type="submit"
                 size="sm"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-tree-600 hover:bg-tree-700 text-white px-4 py-2 rounded-lg"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-tree-600 hover:bg-tree-700 text-white px-4 py-2 rounded-lg shadow-md"
               >
                 Search
               </Button>
@@ -116,12 +114,16 @@ const Header = () => {
             {/* Search Suggestions */}
             {searchSuggestions.length > 0 && (
               <div className="absolute top-full left-0 right-0 bg-white border border-sage-200 rounded-lg shadow-lg mt-1 z-50 animate-fade-in">
-                <div className="p-2 text-sm text-sage-600 border-b">Did you mean:</div>
+                <div className="p-2 text-sm text-sage-600 border-b">Suggestions:</div>
                 {searchSuggestions.map((suggestion, index) => (
                   <button
                     key={index}
-                    onClick={() => applySuggestion(suggestion)}
-                    className="w-full text-left px-3 py-2 hover:bg-tree-50 text-tree-600 capitalize"
+                    onClick={() => {
+                      setSearchQuery(suggestion);
+                      setSearchSuggestions([]);
+                      navigate(`/products?search=${encodeURIComponent(suggestion)}`);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-tree-50 text-tree-600"
                   >
                     {suggestion}
                   </button>
@@ -147,47 +149,6 @@ const Header = () => {
               <Search className="h-5 w-5" />
             </Button>
 
-            {/* Sustainability Score */}
-            <div className="hidden sm:flex items-center space-x-2 text-sage-600">
-              <span className="text-sm">Score:</span>
-              <span className="font-bold text-tree-600">{sustainabilityScore}</span>
-            </div>
-
-            {/* User Auth Buttons */}
-            {!isAuthenticated && (
-              <div className="hidden sm:flex items-center space-x-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-sage-600 hover:text-tree-600"
-                  onClick={() => navigate('/login')}
-                >
-                  Sign In
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-tree-600 hover:bg-tree-700 text-white"
-                  onClick={() => navigate('/signup')}
-                >
-                  Join Now
-                </Button>
-              </div>
-            )}
-
-            {/* Wishlist */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden sm:flex items-center space-x-2 text-sage-600 hover:text-tree-600 relative hover-scale"
-            >
-              <Heart className="h-5 w-5" />
-              <span className="hidden lg:inline text-sm font-medium">Wishlist</span>
-              {getWishlistItemsCount() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-coral text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                  {getWishlistItemsCount()}
-                </span>
-              )}
-            </Button>
 
             {/* Cart */}
             <Link to="/cart">

@@ -18,8 +18,8 @@ const ProductRecommendations = ({ userId, currentProductId, limit = 4 }: Product
     // Simple algorithm: prioritize bestsellers and highly rated items
     recommendedProducts = recommendedProducts
       .sort((a, b) => {
-        const scoreA = (a.isBestseller ? 2 : 0) + (a.rating * 0.5) + (a.sustainabilityScore * 0.01);
-        const scoreB = (b.isBestseller ? 2 : 0) + (b.rating * 0.5) + (b.sustainabilityScore * 0.01);
+        const scoreA = (a.isBestseller ? 2 : 0) + (a.rating * 0.5);
+        const scoreB = (b.isBestseller ? 2 : 0) + (b.rating * 0.5);
         return scoreB - scoreA;
       })
       .slice(0, limit);

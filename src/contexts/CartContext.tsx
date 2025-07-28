@@ -17,9 +17,19 @@ interface WishlistItem {
   image: string;
 }
 
+interface Order {
+  id: string;
+  date: string;
+  items: CartItem[];
+  total: number;
+  status: string;
+  shippingAddress: string;
+}
+
 interface CartContextType {
   cartItems: CartItem[];
   wishlistItems: WishlistItem[];
+  orderHistory: Order[];
   addToCart: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
@@ -29,7 +39,8 @@ interface CartContextType {
   getCartTotal: () => number;
   getCartItemsCount: () => number;
   getWishlistItemsCount: () => number;
-  purchaseComplete: () => void;
+  getOrderCount: () => number;
+  completeOrder: (shippingInfo: any) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -37,6 +48,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+  const [orderHistory, setOrderHistory] = useState<Order[]>([]);
   const { toast } = useToast();
 
   const addToCart = (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
@@ -121,10 +133,24 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setCartItems([]);
   };
 
-  const purchaseComplete = () => {
-    // This function will be called when a purchase is completed
-    // The rewards logic will be handled in the checkout process
+  const completeOrder = (shippingInfo: any) => {
+    const orderNumber = `GW${Date.now().toString().slice(-8)}`;
+    const newOrder: Order = {
+      id: orderNumber,
+      date: new Date().toLocaleDateString(),
+      items: [...cartItems],
+      total: getCartTotal(),
+      status: 'processing',
+      shippingAddress: `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.zip}`
+    };
+    
+    setOrderHistory(prev => [newOrder, ...prev]);
     clearCart();
+    return orderNumber;
+  };
+
+  const getOrderCount = () => {
+    return orderHistory.length;
   };
 
   const getCartTotal = () => {
@@ -143,6 +169,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     <CartContext.Provider value={{
       cartItems,
       wishlistItems,
+      orderHistory,
       addToCart,
       removeFromCart,
       updateQuantity,
@@ -152,7 +179,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       getCartTotal,
       getCartItemsCount,
       getWishlistItemsCount,
-      purchaseComplete
+      getOrderCount,
+      completeOrder
     }}>
       {children}
     </CartContext.Provider>

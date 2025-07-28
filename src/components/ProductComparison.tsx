@@ -10,7 +10,7 @@ interface Product {
   name: string;
   price: number;
   rating: number;
-  sustainabilityScore: number;
+  
   certifications: string[];
   carbonFootprint: string;
   image: string;
@@ -97,19 +97,6 @@ const ProductComparison = ({ comparedProducts, onRemoveProduct, onClearAll }: Pr
               ))}
             </tr>
             
-            <tr>
-              <td className="py-3 px-2 font-medium text-sage-700">Sustainability Score</td>
-              {compareProducts.map(product => (
-                <td key={product.id} className="py-3 px-2 text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Recycle className="h-4 w-4 text-forest-600" />
-                    <span className="font-bold text-forest-700">
-                      {product.sustainabilityScore}/100
-                    </span>
-                  </div>
-                </td>
-              ))}
-            </tr>
             
             <tr>
               <td className="py-3 px-2 font-medium text-sage-700">Carbon Impact</td>

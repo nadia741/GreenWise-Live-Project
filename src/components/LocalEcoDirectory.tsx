@@ -27,7 +27,7 @@ const LocalEcoDirectory = () => {
       rating: 4.8,
       distance: 0.5,
       address: '123 Eco Street, Green City',
-      phone: '+099 123-4567',
+      phone: '(555) 123-4567',
       hours: '8 AM - 8 PM',
       description: 'Local organic produce and zero-waste grocery shopping',
       certifications: ['Organic Certified', 'Fair Trade']
@@ -39,7 +39,7 @@ const LocalEcoDirectory = () => {
       rating: 4.9,
       distance: 1.2,
       address: '456 Solar Ave, Eco Town',
-      phone: '+099 123-4567',
+      phone: '(555) 987-6543',
       hours: '9 AM - 6 PM',
       description: 'Professional solar panel installation and maintenance',
       certifications: ['NABCEP Certified', 'Green Business']

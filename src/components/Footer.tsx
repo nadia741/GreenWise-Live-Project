@@ -41,7 +41,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-outfit font-semibold text-white mb-6">Quick Links</h3>
             <ul className="space-y-3">
-              {['Products', 'Categories', 'Sustainability', 'Blog', 'About Us', 'How It Works'].map((link) => (
+              {['Products', 'Categories', 'Blog', 'About Us'].map((link) => (
                 <li key={link}>
                   <a href="#" className="text-cream-200 hover:text-sage-300 transition-colors">
                     {link}
@@ -55,19 +55,22 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-outfit font-semibold text-white mb-6">Support</h3>
             <ul className="space-y-3">
-              {['Help Center', 'Shipping Info', 'Returns', 'Size Guide', 'Contact Us', 'FAQ'].map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-cream-200 hover:text-sage-300 transition-colors">
-                    {link}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <a href="#" className="text-cream-200 hover:text-sage-300 transition-colors">
+                  Contact Us
+                </a>
+              </li>
+              <li>
+                <a href="/faq" className="text-cream-200 hover:text-sage-300 transition-colors">
+                  FAQ
+                </a>
+              </li>
             </ul>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-lg font-outfit font-semibold text-white mb-6">Get in Touch</h3>
+            <h3 className="text-lg font-outfit font-semibold text-white mb-6">Contact Us</h3>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-sage-300" />
@@ -86,20 +89,14 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Newsletter */}
-            <div className="mt-8">
-              <h4 className="text-white font-semibold mb-3">Stay Updated</h4>
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-2 bg-forest-700 border border-forest-600 rounded-l-btn text-cream-100 placeholder-cream-300 focus:outline-none focus:border-sage-400"
-                />
-                <button className="bg-sage-500 hover:bg-sage-600 text-white px-6 py-2 rounded-r-btn transition-colors">
-                  Subscribe
-                </button>
+            <h3 className="text-lg font-outfit font-semibold text-white mb-6 mt-8">Help Center</h3>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-sage-300" />
+                <span className="text-cream-200">+1 (555) 987-6543</span>
               </div>
             </div>
+
           </div>
         </div>
 

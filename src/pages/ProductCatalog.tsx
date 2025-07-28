@@ -23,7 +23,6 @@ const ProductCatalog = () => {
     subcategory: 'all',
     priceRange: [0, 100],
     certifications: [] as string[],
-    sustainabilityScore: 0,
     sortBy: 'featured'
   });
   
@@ -78,10 +77,6 @@ const ProductCatalog = () => {
         }
       }
 
-      // Sustainability score filter
-      if (product.sustainabilityScore < filters.sustainabilityScore) {
-        return false;
-      }
 
       return true;
     });
@@ -96,9 +91,6 @@ const ProductCatalog = () => {
         break;
       case 'rating':
         filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'sustainability':
-        filtered.sort((a, b) => b.sustainabilityScore - a.sustainabilityScore);
         break;
       case 'newest':
         filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
@@ -139,7 +131,7 @@ const ProductCatalog = () => {
       subcategory: 'all',
       priceRange: [0, 100],
       certifications: [],
-      sustainabilityScore: 0,
+      
       sortBy: 'featured'
     });
     setCurrentPage(1);
@@ -203,23 +195,6 @@ const ProductCatalog = () => {
                 />
               </div>
 
-              {/* Sustainability Score Filter */}
-              <div className="mb-6">
-                <Label className="text-sm font-medium text-forest-700 mb-3 block">
-                  Minimum Sustainability Score: {filters.sustainabilityScore}
-                </Label>
-                <Slider
-                  value={[filters.sustainabilityScore]}
-                  onValueChange={(value) => {
-                    setFilters(prev => ({ ...prev, sustainabilityScore: value[0] }));
-                    setCurrentPage(1);
-                  }}
-                  max={100}
-                  min={0}
-                  step={10}
-                  className="w-full"
-                />
-              </div>
 
               {/* Certifications Filter */}
               <div className="mb-6">
@@ -277,7 +252,7 @@ const ProductCatalog = () => {
                     <SelectItem value="price-low">Price: Low to High</SelectItem>
                     <SelectItem value="price-high">Price: High to Low</SelectItem>
                     <SelectItem value="rating">Highest Rated</SelectItem>
-                    <SelectItem value="sustainability">Most Sustainable</SelectItem>
+                    
                     <SelectItem value="newest">Newest First</SelectItem>
                   </SelectContent>
                 </Select>

@@ -90,8 +90,8 @@ const About = () => {
                 <span className="block text-tree-200">Commerce</span>
               </h1>
               <p className="text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed text-tree-100">
-                We're not just another e-commerce platform. We're a movement towards conscious consumption, 
-                connecting ethical brands with environmentally aware consumers to create lasting positive change.
+                We're a movement towards conscious consumption, connecting ethical brands with 
+                environmentally aware consumers to create lasting positive change.
               </p>
             </div>
           </div>
@@ -204,33 +204,6 @@ const About = () => {
           </div>
         </section>
 
-        {/* Achievements Section */}
-        <section className="py-20 bg-gradient-to-br from-forest-600 to-tree-600 text-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-outfit font-bold mb-6">Our Impact So Far</h2>
-              <p className="text-xl text-tree-100 max-w-3xl mx-auto">
-                Together with our community, we're making measurable progress toward a sustainable future
-              </p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {achievements.map((achievement, index) => (
-                <div 
-                  key={index} 
-                  className="text-center animate-fade-in-scale"
-                  style={{ animationDelay: `${index * 0.2}s` }}
-                >
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl mb-4 shadow-lg">
-                    <achievement.icon className="h-8 w-8" />
-                  </div>
-                  <div className="text-4xl font-outfit font-bold mb-2">{achievement.number}</div>
-                  <div className="text-lg font-semibold mb-2">{achievement.label}</div>
-                  <div className="text-tree-100 text-sm">{achievement.description}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* Contact Section */}
         <section className="py-20 bg-gradient-to-b from-sage-50/50 to-cream-50">

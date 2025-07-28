@@ -254,23 +254,6 @@ const FeaturedProducts = () => {
           </Button>
         </div>
 
-        {/* Call to Action */}
-        <div className="text-center mt-16">
-          <div className="bg-gradient-to-r from-tree-600 to-forest-600 rounded-3xl p-12 shadow-2xl text-white">
-            <h3 className="text-3xl font-outfit font-bold mb-4">
-              Ready to Shop More Sustainable Products?
-            </h3>
-            <p className="text-tree-100 mb-8 max-w-2xl mx-auto text-lg">
-              Explore our full catalog of eco-friendly products and join the sustainable living movement.
-            </p>
-            <Button 
-              size="lg"
-              className="bg-white text-tree-600 hover:bg-cream-50 font-semibold px-10 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-            >
-              View All Products
-            </Button>
-          </div>
-        </div>
       </div>
     </section>
   );

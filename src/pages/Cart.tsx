@@ -64,7 +64,7 @@ const Cart = () => {
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       {/* Product Image */}
-                      <div className="w-20 h-20 rounded-lg overflow-hidden hover:scale-110 transition-transform duration-300">
+                      <div className="w-20 h-20 rounded-lg overflow-hidden hover:scale-110 transition-transform duration-300 flex-shrink-0">
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       
@@ -139,14 +139,6 @@ const Cart = () => {
                 </div>
               </div>
               
-              {/* Promo Code */}
-              <div className="bg-white rounded-eco shadow-eco p-6 animate-scale-in" style={{ animationDelay: '0.3s' }}>
-                <h3 className="font-semibold text-forest-700 mb-4">Promo Code</h3>
-                <div className="flex gap-2">
-                  <Input placeholder="Enter code" className="flex-1 focus:ring-2 focus:ring-tree-300 transition-all" />
-                  <Button variant="outline" className="hover:bg-tree-50 transition-colors">Apply</Button>
-                </div>
-              </div>
               
               {/* Order Summary */}
               <div className="bg-white rounded-eco shadow-eco p-6 animate-scale-in" style={{ animationDelay: '0.4s' }}>

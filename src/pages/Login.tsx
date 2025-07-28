@@ -1,23 +1,54 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', { email, password, rememberMe });
-    // Add authentication logic here
+    setIsLoading(true);
+    
+    try {
+      const success = await login(email, password);
+      if (success) {
+        toast({
+          title: "🎉 Welcome back!",
+          description: "You have successfully signed in.",
+          duration: 3000,
+        });
+        navigate('/');
+      } else {
+        toast({
+          title: "Login Failed",
+          description: "Invalid email or password. Please try again.",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        duration: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -106,13 +137,17 @@ const Login = () => {
                   />
                   <span className="ml-2 text-sm text-sage-600">Remember me</span>
                 </label>
-                <Link to="/forgot-password" className="text-sm text-sage-600 hover:text-sage-800">
+                <Link to="/forgot-password" className="text-sm text-tree-600 hover:text-tree-700">
                   Forgot password?
                 </Link>
               </div>
 
-              <Button type="submit" className="w-full bg-sage-500 hover:bg-sage-600">
-                Sign In
+              <Button 
+                type="submit" 
+                className="w-full bg-forest-700 hover:bg-forest-800"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
 

@@ -1,7 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import heroSlide1 from '@/assets/hero-slide-1.jpg';
+import heroSlide2 from '@/assets/hero-slide-2.jpg';
+import heroSlide3 from '@/assets/hero-slide-3.jpg';
+import heroSlide4 from '@/assets/hero-slide-4.jpg';
+import heroSlide5 from '@/assets/hero-slide-5.jpg';
 
 interface Slide {
   id: number;
@@ -23,49 +27,49 @@ const HeroSlider = () => {
       title: "Sustainable Living Made Simple",
       subtitle: "Eco-Conscious Shopping",
       description: "Discover premium eco-friendly products that don't compromise on quality or style. Join 50,000+ conscious consumers making a difference.",
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      cta: "Shop Collection",
+      image: heroSlide1,
+      cta: "Shop Now",
       ctaLink: "/products",
       theme: 'dark'
     },
     {
       id: 2,
-      title: "Carbon Neutral Delivery",
-      subtitle: "Free Shipping on Orders $75+",
-      description: "Every order plants a tree and offsets carbon emissions. Experience guilt-free shopping with our carbon-neutral delivery service.",
-      image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=2075&auto=format&fit=crop&ixlib=rb-4.0.3",
-      cta: "Learn More",
-      ctaLink: "/how-it-works",
+      title: "Nature's Finest Selection",
+      subtitle: "Organic & Sustainable",
+      description: "Handpicked eco-friendly products in harmony with nature. Experience the perfect blend of sustainability and quality.",
+      image: heroSlide2,
+      cta: "Explore",
+      ctaLink: "/products",
       theme: 'dark'
     },
     {
       id: 3,
-      title: "Certified Organic Collection",
-      subtitle: "Premium Quality Guaranteed",
-      description: "Handpicked organic products with verified certifications. From fashion to home goods, experience the finest sustainable materials.",
-      image: "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      cta: "Browse Organic",
-      ctaLink: "/products?category=organic",
+      title: "Clean Living Essentials",
+      subtitle: "Modern Eco-Lifestyle",
+      description: "Transform your home with sustainable products that bring nature indoors. Clean, modern, and environmentally conscious.",
+      image: heroSlide3,
+      cta: "Discover",
+      ctaLink: "/products",
       theme: 'light'
     },
     {
       id: 4,
-      title: "Plastic-Free Initiative",
-      subtitle: "Zero Waste Packaging",
-      description: "All our packaging is 100% compostable or recyclable. Join our mission to eliminate single-use plastics from e-commerce.",
-      image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?q=80&w=2052&auto=format&fit=crop&ixlib=rb-4.0.3",
-      cta: "Our Mission",
-      ctaLink: "/about",
+      title: "Garden Fresh Collection",
+      subtitle: "Naturally Beautiful",
+      description: "Embrace sustainable fashion and lifestyle products that grow with nature's rhythm. Fresh, vibrant, and eco-friendly.",
+      image: heroSlide4,
+      cta: "Shop Green",
+      ctaLink: "/products",
       theme: 'dark'
     },
     {
       id: 5,
-      title: "Summer Eco-Collection 2024",
-      subtitle: "Limited Edition - 50% Off",
-      description: "Sustainable summer essentials crafted from renewable materials. Limited time offer on our exclusive eco-conscious collection.",
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-      cta: "Shop Sale",
-      ctaLink: "/products?sale=true",
+      title: "Ocean-Inspired Sustainability",
+      subtitle: "Protecting Our Planet",
+      description: "Eco-friendly products that honor our oceans and planet. Every purchase supports environmental protection initiatives.",
+      image: heroSlide5,
+      cta: "Make Impact",
+      ctaLink: "/products",
       theme: 'light'
     }
   ];
@@ -145,28 +149,6 @@ const HeroSlider = () => {
                       {slide.description}
                     </p>
 
-                    {/* CTA Button */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                      <Button 
-                        size="lg" 
-                        className="bg-sage-500 hover:bg-sage-600 text-white font-semibold px-8 py-4 rounded-btn shadow-eco-lg hover-lift text-lg transition-all duration-300"
-                        onClick={() => window.location.href = slide.ctaLink}
-                      >
-                        {slide.cta}
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="lg"
-                        className={`font-semibold px-8 py-4 rounded-btn text-lg transition-all duration-300 ${
-                          slide.theme === 'dark' 
-                            ? 'border-2 border-white text-white hover:bg-white hover:text-forest-700' 
-                            : 'border-2 border-forest-700 text-forest-700 hover:bg-forest-700 hover:text-white'
-                        }`}
-                        onClick={() => window.location.href = '/how-it-works'}
-                      >
-                        Learn More
-                      </Button>
-                    </div>
 
                     {/* Impact Stats */}
                     <div className="grid grid-cols-3 gap-6 pt-8 max-w-lg">
@@ -206,14 +188,14 @@ const HeroSlider = () => {
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 lg:left-8 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full shadow-eco transition-all duration-300 z-20 hover-scale"
+        className="absolute left-4 lg:left-8 top-1/2 transform -translate-y-1/2 bg-sage-600/80 hover:bg-sage-700/90 backdrop-blur-sm text-white p-3 rounded-full shadow-lg transition-all duration-300 z-20 hover:scale-110 active:scale-95"
         aria-label="Previous slide"
       >
         <ChevronLeft className="h-6 w-6" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 lg:right-8 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full shadow-eco transition-all duration-300 z-20 hover-scale"
+        className="absolute right-4 lg:right-8 top-1/2 transform -translate-y-1/2 bg-sage-600/80 hover:bg-sage-700/90 backdrop-blur-sm text-white p-3 rounded-full shadow-lg transition-all duration-300 z-20 hover:scale-110 active:scale-95"
         aria-label="Next slide"
       >
         <ChevronRight className="h-6 w-6" />
@@ -225,10 +207,10 @@ const HeroSlider = () => {
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+            className={`w-4 h-4 rounded-full transition-all duration-300 border-2 ${
               index === currentSlide 
-                ? 'bg-white scale-125 shadow-lg' 
-                : 'bg-white/50 hover:bg-white/70 hover:scale-110'
+                ? 'bg-sage-500 border-sage-300 scale-125 shadow-lg' 
+                : 'bg-white/30 border-white/50 hover:bg-white/50 hover:border-white/70 hover:scale-110'
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
@@ -236,9 +218,9 @@ const HeroSlider = () => {
       </div>
 
       {/* Progress Bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+      <div className="absolute bottom-0 left-0 right-0 h-2 bg-black/20">
         <div 
-          className="h-full bg-sage-400 transition-all duration-1000 ease-linear"
+          className="h-full bg-gradient-to-r from-sage-500 to-tree-500 transition-all duration-1000 ease-linear shadow-sm"
           style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
         />
       </div>

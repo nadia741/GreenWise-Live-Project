@@ -75,8 +75,6 @@ const Login = () => {
                 Continue with Facebook
               </Button>
             </div>
-
-
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>

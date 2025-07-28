@@ -75,7 +75,8 @@ const Login = () => {
                 Continue with Facebook
               </Button>
             </div>
-            {/* Login Form */}
+
+            {/* Login Forms */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <Label htmlFor="email">Email address</Label>

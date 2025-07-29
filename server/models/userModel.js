@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { type } = require('os');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -14,6 +15,10 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    isAdmin:{
+        type: Boolean,
+        default: false,
     },
     address: {
         street: String,

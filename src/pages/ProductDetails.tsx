@@ -17,7 +17,7 @@ const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { addToCart } = useCart();
+  const { addToCart, addToWishlist, removeFromWishlist, wishlistItems } = useCart();
   const { user } = useAuth();
   const { earnPoints } = useRewards();
   const [quantity, setQuantity] = useState(1);
@@ -25,6 +25,9 @@ const ProductDetails = () => {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [showOrderSuccess, setShowOrderSuccess] = useState(false);
+  
+  // Check if the product is in the wishlist
+  const isInWishlist = wishlistItems.some(item => item.id === id);
 
   // Mock product data
   const product = {
@@ -282,30 +285,46 @@ const ProductDetails = () => {
                 <Button 
                   variant="outline" 
                   size="icon" 
-                  className={`border-sage-300 hover:bg-sage-50 w-16 h-16 transition-all duration-300 ${
+                  className={`border-sage-300 hover:bg-sage-50 w-12 h-12 transition-all duration-300 ${
                     isLiked ? 'bg-coral-50 border-coral-300' : ''
                   }`}
                   onClick={() => {
-                    setIsLiked(!isLiked);
-                    toast({
-                      title: isLiked ? "Removed from Wishlist" : "Added to Wishlist",
-                      description: isLiked ? "💔 Item removed" : "❤️ Item saved for later",
-                      duration: 2000,
-                    });
+                    if (!user) {
+                      toast({
+                        title: "Sign In Required",
+                        description: "Please sign in to manage your wishlist",
+                        duration: 3000,
+                      });
+                      navigate('/login');
+                      return;
+                    }
+
+                    if (isInWishlist) {
+                      removeFromWishlist(id!);
+                      setIsLiked(false);
+                    } else {
+                      addToWishlist({
+                        id: id!,
+                        name: product.name,
+                        price: product.price,
+                        image: product.images[0]
+                      });
+                      setIsLiked(true);
+                    }
                   }}
                 >
-                  <Heart className={`h-6 w-6 transition-all duration-300 ${
-                    isLiked ? 'fill-coral text-coral heart-bounce' : 'text-sage-600'
+                  <Heart className={`h-8 w-8 transition-all duration-300 ${
+                    isInWishlist || isLiked ? 'fill-coral text-coral heart-bounce' : 'text-sage-600'
                   }`} />
                 </Button>
               </div>
               
-              <Button 
+              {/* <Button 
                 className="w-full bg-tree-600 hover:bg-tree-700 text-white text-lg py-6"
                 onClick={handleBuyNow}
               >
                 Buy Now - Express Checkout
-              </Button>
+              </Button> */}
               
               <div className="flex items-center gap-6 text-sm text-sage-600">
                 <div className="flex items-center">

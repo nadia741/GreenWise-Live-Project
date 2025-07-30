@@ -44,7 +44,32 @@ const productSchema = new mongoose.Schema({
         default: 0
     },
     sustainabilityFeatures: [{
-        type: String
+        type: String,
+        enum: [
+        "Recyclable",
+        "BPA-free",
+        "Long-lasting",
+        "Locally sourced",
+        "No plastic packaging",
+        "Bee-friendly harvesting",
+        "Solar energy",
+        "Durable materials",
+        "No electricity required",
+        "Plastic-free",
+        "100% compostable",
+        "Zero toxic chemicals",
+        "Vegan",
+        "Biodegradable",
+        "Water-resistant",
+        "Organic ingredients",
+        "Compostable packaging",
+        "No artificial additives",
+        "Cruelty-free",
+        "Plastic-free jar",
+        "Natural ingredients"
+        ],
+        default: [],
+        required: false
     }]
 }, {
     timestamps: true

@@ -58,7 +58,9 @@ const getProductById = async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 const createProduct = async (req, res) => {
-    const {
+
+    try {
+         const {
         name,
         description,
         price,
@@ -78,13 +80,12 @@ const createProduct = async (req, res) => {
         sustainabilityScore,
         inventory,
         sustainabilityFeatures
-    });
+    }); 
 
-    if (product) {
-        res.status(201).json(product);
-    } else {
-        res.status(400);
-        throw new Error('Invalid product data');
+     res.status(201).json(product);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error while creating product' });
+        return;   
     }
 };
 

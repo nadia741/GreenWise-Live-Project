@@ -35,7 +35,7 @@ const ProductCatalog = () => {
   const allCertifications = [...new Set(products.flatMap(p => p.certifications))];
 
   const filteredProducts = useMemo(() => {
-    let filtered = products.filter(product => {
+    const filtered = products.filter(product => {
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();

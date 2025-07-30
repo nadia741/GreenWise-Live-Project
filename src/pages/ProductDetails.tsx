@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Heart, ShoppingCart, Truck, Shield, Recycle, Minus, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth';
 import { useRewards } from '@/contexts/RewardsContext';
 import OrderSuccessMessage from '@/components/OrderSuccessMessage';
 import ProductReviews from '@/components/ProductReviews';
@@ -348,7 +348,7 @@ const ProductDetails = () => {
 
         {/* Recommendations */}
         <div className="mb-16">
-          <ProductRecommendations currentProductId={product.id} userId={user?.id} />
+          <ProductRecommendations currentProductId={product.id} userId={user?._id} />
         </div>
       </div>
 

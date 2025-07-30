@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Truck, Shield, Leaf } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth';
 import { useRewards } from '@/contexts/RewardsContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -23,8 +23,8 @@ const Checkout = () => {
   
   // Form states
   const [shippingInfo, setShippingInfo] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
+    firstName: user?.name.includes(' ') ? user.name.split(' ')[0] : user?.name || '',
+    lastName: user?.name.includes(' ') ? user.name.split(' ').slice(1).join(' ') :  '',
     email: user?.email || '',
     address: '',
     city: '',

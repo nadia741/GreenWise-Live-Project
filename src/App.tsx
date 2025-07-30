@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useScrollToTop } from "./hooks/useScrollToTop";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/auth/AuthProvider";
 import { CartProvider } from "./contexts/CartContext";
 import { RewardsProvider } from "./contexts/RewardsContext";
 import Index from "./pages/Index";
@@ -56,21 +56,21 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <RewardsProvider>
-        <CartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+  <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RewardsProvider>
+          <CartProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
               <AppContent />
-            </BrowserRouter>
-          </TooltipProvider>
-        </CartProvider>
-      </RewardsProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+            </TooltipProvider>
+          </CartProvider>
+        </RewardsProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </BrowserRouter>
 );
 
 export default App;

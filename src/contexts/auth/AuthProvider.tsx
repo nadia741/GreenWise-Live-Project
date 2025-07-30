@@ -1,5 +1,5 @@
-
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+// AuthProvider.tsx
+import React, { createContext, useState, ReactNode } from 'react';
 import { api } from '@/services/api';
 
 interface User {
@@ -21,20 +21,15 @@ interface AuthContextType {
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem('auth_user');
-    try {
-      return savedUser ? JSON.parse(savedUser) : null;
-    } catch {
-      localStorage.removeItem('auth_user');
-      return null;
-    }
+    return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const response = await api.auth.login(email, password);
       const userData: User = {
@@ -48,13 +43,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return true;
     } catch (error) {
       if (error instanceof Error) {
-        throw error;
+        throw new Error(error.message);
       }
       throw new Error('Login failed');
     }
-  }, []);
+  };
 
-  const signup = useCallback(async (userData: {
+  const signup = async (userData: {
     name: string;
     email: string;
     password: string;
@@ -67,41 +62,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: response.email,
         token: response.token
       };
+      
       setUser(newUser);
       localStorage.setItem('auth_user', JSON.stringify(newUser));
       return true;
     } catch (error) {
       if (error instanceof Error) {
-        throw error;
+        throw new Error(error.message);
       }
       throw new Error('Registration failed');
     }
-  }, []);
+  };
 
-  const logout = useCallback(() => {
+  const logout = () => {
     setUser(null);
     localStorage.removeItem('auth_user');
-  }, []);
-
-  const contextValue = React.useMemo(() => ({
-    user,
-    isAuthenticated: !!user,
-    login,
-    signup,
-    logout
-  }), [user, login, signup, logout]);
+  };
 
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        login,
+        signup,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };

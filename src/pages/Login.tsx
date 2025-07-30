@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
@@ -33,19 +33,14 @@ const Login = () => {
           duration: 3000,
         });
         navigate('/');
-      } else {
-        toast({
+      } 
+    } catch (error: unknown) {
+     toast({
+          variant: "destructive",
           title: "Login Failed",
           description: "Invalid email or password. Please try again.",
           duration: 3000,
         });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        duration: 3000,
-      });
     } finally {
       setIsLoading(false);
     }
@@ -117,9 +112,9 @@ const Login = () => {
                   />
                   <span className="ml-2 text-sm text-sage-600">Remember me</span>
                 </label>
-                <Link to="/forgot-password" className="text-sm text-tree-600 hover:text-tree-700">
+                {/* <Link to="/forgot-password" className="text-sm text-tree-600 hover:text-tree-700">
                   Forgot password?
-                </Link>
+                </Link> */}
               </div>
 
               <Button 

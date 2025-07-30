@@ -16,11 +16,7 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState('Order History');
   const { orderHistory, getOrderCount, wishlistItems, addToCart, removeFromWishlist } = useCart();
 
-  const profileData = {
-    name: "Eco Enthusiast",
-    email: "hellonadia321@gmail.com",
-    memberSince: "2023",
-  };
+const {name, email} = JSON.parse(localStorage.getItem('auth_user') || '{}')
 
   const tabs = ['Order History', 'Wishlist'];
 
@@ -38,12 +34,10 @@ const Profile = () => {
             
             <div className="flex-1">
               <h1 className="text-3xl font-outfit font-bold text-forest-700 mb-2">
-                {profileData.name}
+                {name}
               </h1>
-              <p className="text-sage-600 mb-2">{profileData.email}</p>
-              <div className="flex items-center gap-4 text-sm text-sage-500">
-                <span>Member since {profileData.memberSince}</span>
-              </div>
+              <p className="text-sage-600 mb-2">{email}</p>
+             
             </div>
           </div>
         </div>

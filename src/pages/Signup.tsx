@@ -7,15 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { validateEmail, validatePassword, validateName } from '@/utils/validation';
 import { Loader2 } from 'lucide-react';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -38,12 +37,8 @@ const Signup = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!validateName(formData.firstName)) {
-      newErrors.firstName = 'First name must be at least 2 characters and contain only letters';
-    }
-
-    if (!validateName(formData.lastName)) {
-      newErrors.lastName = 'Last name must be at least 2 characters and contain only letters';
+    if (!validateName(formData.name)) {
+      newErrors.name = 'Name must be at least 2 characters and contain only letters';
     }
 
     if (!validateEmail(formData.email)) {
@@ -78,8 +73,7 @@ const Signup = () => {
 
     try {
       const success = await signup({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        name: formData.name,
         email: formData.email,
         password: formData.password
       });
@@ -121,36 +115,21 @@ const Signup = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName">First Name *</Label>
-                <Input 
-                  id="firstName" 
-                  type="text" 
-                  placeholder="John"
-                  value={formData.firstName}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
-                  className={errors.firstName ? 'border-red-500' : ''}
-                />
-                {errors.firstName && (
-                  <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="lastName">Last Name *</Label>
-                <Input 
-                  id="lastName" 
-                  type="text" 
-                  placeholder="Doe"
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
-                  className={errors.lastName ? 'border-red-500' : ''}
-                />
-                {errors.lastName && (
-                  <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
-                )}
-              </div>
+            <div>
+              <Label htmlFor="name">Full Name *</Label>
+              <Input 
+                id="name" 
+                type="text" 
+                placeholder="John Doe"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                className={errors.name ? 'border-red-500' : ''}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+              )}
             </div>
+      
 
             <div>
               <Label htmlFor="email">Email *</Label>

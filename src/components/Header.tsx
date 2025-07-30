@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth/useAuth';
 import { useCart } from '@/contexts/CartContext';
 import { useRewards } from '@/contexts/RewardsContext';
 import { getSpellingSuggestions } from '@/utils/spellCheck';
@@ -177,7 +177,7 @@ const Header = () => {
                 >
                   <User className="h-5 w-5" />
                   <span className="hidden lg:inline text-sm font-medium">
-                    {isAuthenticated ? user?.firstName : 'Account'}
+                    {isAuthenticated ? user?.name : 'Account'}
                   </span>
                 </Button>
               </DropdownMenuTrigger>

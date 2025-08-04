@@ -1,23 +1,49 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Star, Heart, ShoppingCart, Truck, Shield, Recycle, Minus, Plus } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/auth';
-import { useRewards } from '@/contexts/RewardsContext';
-import OrderSuccessMessage from '@/components/OrderSuccessMessage';
-import ProductReviews from '@/components/ProductReviews';
-import ProductRecommendations from '@/components/ProductRecommendations';
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import OrderSuccessMessage from "@/components/OrderSuccessMessage";
+import ProductRecommendations from "@/components/ProductRecommendations";
+import ProductReviews from "@/components/ProductReviews";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/auth";
+import { useCart } from "@/hooks/useCart";
+import { useRewards } from "@/contexts/RewardsContext";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Heart,
+  Minus,
+  Plus,
+  Recycle,
+  Shield,
+  ShoppingCart,
+  Star,
+  Truck,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image: string;
+  sustainabilityScore: number;
+  inventory: number;
+  averageRating: number;
+  numReviews: number;
+  sustainabilityFeatures: string[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { addToCart, addToWishlist, removeFromWishlist, wishlistItems } = useCart();
+  const { addToCart, addToWishlist, removeFromWishlist, wishlistItems } =
+    useCart();
   const { user } = useAuth();
   const { earnPoints } = useRewards();
   const [quantity, setQuantity] = useState(1);
@@ -25,72 +51,55 @@ const ProductDetails = () => {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [showOrderSuccess, setShowOrderSuccess] = useState(false);
-  
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   // Check if the product is in the wishlist
-  const isInWishlist = wishlistItems.some(item => item.id === id);
+  const isInWishlist = wishlistItems.some((item) => item._id === id);
 
-  // Mock product data
-  const product = {
-    id: id,
-    name: "Eco-Friendly Bamboo Water Bottle",
-    price: 24.99,
-    originalPrice: 34.99,
-    rating: 4.8,
-    reviews: 156,
-    inStock: true,
-    images: [
-      "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=600&fit=crop"
-    ],
-    description: "Made from sustainable bamboo, this water bottle is perfect for eco-conscious individuals. Features double-wall insulation and leak-proof design with a sleek modern aesthetic.",
-    features: [
-      "100% sustainable bamboo construction",
-      "Double-wall insulation keeps drinks cold for 24hrs",
-      "Leak-proof design with secure cap",
-      "BPA-free and food-grade materials",
-      "Lightweight and durable",
-      "Easy-grip ergonomic design"
-    ],
-    sustainability: {
-      carbonSaved: "2.5kg CO₂",
-      recyclable: true,
-      sustainabilityScore: 9.2
-    }
-  };
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!id) {
+        setError("Product ID not found");
+        setLoading(false);
+        return;
+      }
 
-  const mockReviews = [
-    {
-      id: "1",
-      userId: "user1",
-      userName: "Sarah Johnson",
-      rating: 5,
-      comment: "Amazing quality! Love that it's eco-friendly and keeps my drinks cold all day. The bamboo texture feels premium and looks beautiful.",
-      date: "2024-01-15",
-      verified: true,
-      helpful: 12
-    },
-    {
-      id: "2",
-      userId: "user2",
-      userName: "Mike Chen",
-      rating: 4,
-      comment: "Great bottle, very sturdy. The bamboo finish looks beautiful and it's the perfect size for my daily needs.",
-      date: "2024-01-10",
-      verified: true,
-      helpful: 8
-    },
-    {
-      id: "3",
-      userId: "user3",
-      userName: "Emma Wilson",
-      rating: 5,
-      comment: "Best purchase I've made this year! Sustainable, functional, and stylish. Highly recommend to anyone looking to reduce plastic waste.",
-      date: "2024-01-08",
-      verified: true,
-      helpful: 15
-    }
-  ];
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/products/${id}`);
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError("Product not found");
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return;
+        }
+
+        const data = await response.json();
+        setProduct(data);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        setError("Failed to load product details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  // Generate multiple image views for the product (using the same image with different parameters)
+  const productImages = product
+    ? [
+        product.image,
+        `${product.image}&brightness=1.1`,
+        `${product.image}&contrast=1.1`,
+      ]
+    : [];
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -99,34 +108,36 @@ const ProductDetails = () => {
         description: "Please sign in to add items to your cart.",
         duration: 4000,
       });
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
+    if (!product) return;
+
     setIsAddingToCart(true);
-    
+
     // Add to cart with animation
-    const button = document.querySelector('.add-to-cart-main');
+    const button = document.querySelector(".add-to-cart-main");
     if (button) {
-      button.classList.add('cart-fly-animation');
+      button.classList.add("cart-fly-animation");
     }
 
     // Add to cart
     addToCart({
-      id: product.id!,
+      id: product._id,
       name: product.name,
       price: product.price,
-      image: product.images[0],
-      quantity: quantity
+      image: product.image,
+      quantity: quantity,
     });
 
     // Notify about successful cart addition
     earnPoints(product.price * quantity);
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setIsAddingToCart(false);
-    
+
     toast({
       title: "Added to Cart! 🛒✨",
       description: `${quantity} x ${product.name} added successfully.`,
@@ -136,7 +147,7 @@ const ProductDetails = () => {
     // Remove animation class
     setTimeout(() => {
       if (button) {
-        button.classList.remove('cart-fly-animation');
+        button.classList.remove("cart-fly-animation");
       }
     }, 1000);
   };
@@ -148,7 +159,7 @@ const ProductDetails = () => {
         description: "Please sign in to proceed with your order.",
         duration: 4000,
       });
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
@@ -156,9 +167,44 @@ const ProductDetails = () => {
     setShowOrderSuccess(true);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-cream-50">
+        <Header />
+        <div className="container mx-auto px-4 py-8 pt-24">
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-forest-600 mx-auto mb-4"></div>
+            <p className="text-forest-600">Loading product details...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-screen bg-cream-50">
+        <Header />
+        <div className="container mx-auto px-4 py-8 pt-24">
+          <div className="text-center py-16">
+            <p className="text-red-600 mb-4">{error || "Product not found"}</p>
+            <Button
+              onClick={() => navigate("/products")}
+              className="bg-forest-600 hover:bg-forest-700"
+            >
+              Browse Products
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   if (showOrderSuccess) {
     return (
-      <OrderSuccessMessage 
+      <OrderSuccessMessage
         orderNumber="GW-2024-001"
         customerName="Eco Friend"
         onContinueShopping={() => setShowOrderSuccess(false)}
@@ -169,30 +215,36 @@ const ProductDetails = () => {
   return (
     <div className="min-h-screen bg-cream-50">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-8 pt-24">
         {/* Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Product Images */}
           <div className="space-y-4">
             <div className="relative aspect-square bg-white rounded-xl shadow-eco overflow-hidden animate-fade-in-scale">
-              <img 
-                src={product.images[selectedImage]} 
+              <img
+                src={productImages[selectedImage]}
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
               />
             </div>
-            
+
             <div className="grid grid-cols-3 gap-3">
-              {product.images.map((image, index) => (
-                <div 
-                  key={index} 
+              {productImages.map((image, index) => (
+                <div
+                  key={index}
                   className={`aspect-square bg-white rounded-lg overflow-hidden cursor-pointer transition-all duration-300 hover-lift ${
-                    selectedImage === index ? 'ring-2 ring-forest-500 shadow-lg' : 'hover:shadow-md'
+                    selectedImage === index
+                      ? "ring-2 ring-forest-500 shadow-lg"
+                      : "hover:shadow-md"
                   }`}
                   onClick={() => setSelectedImage(index)}
                 >
-                  <img src={image} alt={`${product.name} view ${index + 1}`} className="w-full h-full object-cover" />
+                  <img
+                    src={image}
+                    alt={`${product.name} view ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               ))}
             </div>
@@ -201,26 +253,37 @@ const ProductDetails = () => {
           {/* Product Info */}
           <div className="space-y-6 animate-fade-in-up">
             <div>
-              <h1 className="text-4xl font-outfit font-bold text-forest-700 mb-3">{product.name}</h1>
+              <h1 className="text-4xl font-outfit font-bold text-forest-700 mb-3">
+                {product.name}
+              </h1>
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`h-5 w-5 ${i < Math.floor(product.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`} />
+                    <Star
+                      key={i}
+                      className={`h-5 w-5 ${
+                        i < Math.floor(product.averageRating)
+                          ? "fill-amber-400 text-amber-400"
+                          : "text-gray-200"
+                      }`}
+                    />
                   ))}
-                  <span className="ml-2 text-forest-600 font-medium">({product.reviews} reviews)</span>
+                  <span className="ml-2 text-forest-600 font-medium">
+                    ({product.numReviews} reviews)
+                  </span>
                 </div>
-                {product.inStock && <Badge className="bg-forest-100 text-forest-700">✅ In Stock</Badge>}
+                {product.inventory > 0 && (
+                  <Badge className="bg-forest-100 text-forest-700">
+                    ✅ In Stock ({product.inventory} left)
+                  </Badge>
+                )}
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <span className="text-4xl font-bold text-forest-700">${product.price}</span>
-              <div className="flex items-center gap-4">
-                <span className="text-xl text-gray-400 line-through">${product.originalPrice}</span>
-                <Badge className="bg-coral-100 text-coral-700 text-lg px-3 py-1">
-                  Save ${(product.originalPrice - product.price).toFixed(2)}
-                </Badge>
-              </div>
+              <span className="text-4xl font-bold text-forest-700">
+                ${product.price.toFixed(2)}
+              </span>
             </div>
 
             {/* Sustainability Metrics */}
@@ -229,23 +292,37 @@ const ProductDetails = () => {
                 <Recycle className="h-6 w-6 mr-3 text-forest-600" />
                 Environmental Impact
               </h3>
-              <div className="grid grid-cols-3 gap-6 text-center">
+              <div className="grid grid-cols-2 gap-6 text-center">
                 <div>
-                  <div className="font-bold text-forest-700 text-xl">{product.sustainability.carbonSaved}</div>
-                  <div className="text-sage-600 text-sm">Carbon Saved</div>
-                </div>
-                <div>
-                  <div className="font-bold text-forest-700 text-xl">{product.sustainability.sustainabilityScore}/10</div>
+                  <div className="font-bold text-forest-700 text-xl">
+                    {product.sustainabilityScore}/10
+                  </div>
                   <div className="text-sage-600 text-sm">Eco Score</div>
                 </div>
                 <div>
-                  <div className="font-bold text-forest-700 text-xl">✓ 100%</div>
-                  <div className="text-sage-600 text-sm">Recyclable</div>
+                  <div className="font-bold text-forest-700 text-xl">
+                    {product.sustainabilityFeatures.length}
+                  </div>
+                  <div className="text-sage-600 text-sm">Eco Features</div>
                 </div>
               </div>
             </div>
 
-            {/* Quantity and Actions - keeping existing code */}
+            {/* Sustainability Features */}
+            <div>
+              <h3 className="font-semibold text-forest-700 mb-3 text-lg">
+                Sustainability Features
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {product.sustainabilityFeatures.map((feature, index) => (
+                  <Badge key={index} className="bg-tree-100 text-tree-700">
+                    {feature}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity and Actions */}
             <div className="flex items-center gap-4">
               <span className="font-medium text-forest-700">Quantity:</span>
               <div className="flex items-center border border-sage-300 rounded-lg">
@@ -257,11 +334,15 @@ const ProductDetails = () => {
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="px-4 py-2 font-medium min-w-[3rem] text-center">{quantity}</span>
+                <span className="px-4 py-2 font-medium min-w-[3rem] text-center">
+                  {quantity}
+                </span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setQuantity(quantity + 1)}
+                  onClick={() =>
+                    setQuantity(Math.min(quantity + 1, product.inventory))
+                  }
                   className="rounded-none border-l"
                 >
                   <Plus className="h-4 w-4" />
@@ -272,21 +353,29 @@ const ProductDetails = () => {
             {/* Action Buttons */}
             <div className="space-y-4">
               <div className="flex gap-3">
-                <Button 
+                <Button
                   className={`add-to-cart-main flex-1 bg-forest-700 hover:bg-forest-800 text-lg py-6 transition-all duration-300 ${
-                    isAddingToCart ? 'animate-pulse' : 'hover:shadow-lg'
+                    isAddingToCart ? "animate-pulse" : "hover:shadow-lg"
                   }`}
                   onClick={handleAddToCart}
-                  disabled={isAddingToCart}
+                  disabled={isAddingToCart || product.inventory === 0}
                 >
-                  <ShoppingCart className={`h-5 w-5 mr-2 ${isAddingToCart ? 'animate-bounce' : ''}`} />
-                  {isAddingToCart ? 'Adding to Cart...' : `Add ${quantity} to Cart`}
+                  <ShoppingCart
+                    className={`h-5 w-5 mr-2 ${
+                      isAddingToCart ? "animate-bounce" : ""
+                    }`}
+                  />
+                  {isAddingToCart
+                    ? "Adding to Cart..."
+                    : product.inventory === 0
+                    ? "Out of Stock"
+                    : `Add ${quantity} to Cart`}
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   className={`border-sage-300 hover:bg-sage-50 w-12 h-12 transition-all duration-300 ${
-                    isLiked ? 'bg-coral-50 border-coral-300' : ''
+                    isLiked ? "bg-coral-50 border-coral-300" : ""
                   }`}
                   onClick={() => {
                     if (!user) {
@@ -295,7 +384,7 @@ const ProductDetails = () => {
                         description: "Please sign in to manage your wishlist",
                         duration: 3000,
                       });
-                      navigate('/login');
+                      navigate("/login");
                       return;
                     }
 
@@ -304,28 +393,32 @@ const ProductDetails = () => {
                       setIsLiked(false);
                     } else {
                       addToWishlist({
-                        id: id!,
+                        _id: product._id,
                         name: product.name,
                         price: product.price,
-                        image: product.images[0]
+                        image: product.image,
+                        description: product.description,
+                        category: product.category,
+                        sustainabilityScore: product.sustainabilityScore,
+                        inventory: product.inventory,
+                        averageRating: product.averageRating,
+                        numReviews: product.numReviews,
+                        sustainabilityFeatures: product.sustainabilityFeatures,
                       });
                       setIsLiked(true);
                     }
                   }}
                 >
-                  <Heart className={`h-8 w-8 transition-all duration-300 ${
-                    isInWishlist || isLiked ? 'fill-coral text-coral heart-bounce' : 'text-sage-600'
-                  }`} />
+                  <Heart
+                    className={`h-8 w-8 transition-all duration-300 ${
+                      isInWishlist || isLiked
+                        ? "fill-coral text-coral heart-bounce"
+                        : "text-sage-600"
+                    }`}
+                  />
                 </Button>
               </div>
-              
-              {/* <Button 
-                className="w-full bg-tree-600 hover:bg-tree-700 text-white text-lg py-6"
-                onClick={handleBuyNow}
-              >
-                Buy Now - Express Checkout
-              </Button> */}
-              
+
               <div className="flex items-center gap-6 text-sm text-sage-600">
                 <div className="flex items-center">
                   <Truck className="h-4 w-4 mr-2" />
@@ -338,36 +431,32 @@ const ProductDetails = () => {
               </div>
             </div>
 
-            {/* Features */}
-            <div>
-              <h3 className="font-semibold text-forest-700 mb-4 text-lg">Key Features</h3>
-              <ul className="space-y-3">
-                {product.features.map((feature, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="w-2 h-2 bg-forest-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span className="text-forest-600">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
             {/* Description */}
             <div>
-              <h3 className="font-semibold text-forest-700 mb-3 text-lg">Description</h3>
-              <p className="text-forest-600 leading-relaxed">{product.description}</p>
+              <h3 className="font-semibold text-forest-700 mb-3 text-lg">
+                Description
+              </h3>
+              <p className="text-forest-600 leading-relaxed">
+                {product.description}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Reviews Section */}
         <div className="mb-16" id="reviews">
-          <h2 className="text-3xl font-outfit font-bold text-forest-700 mb-8">Customer Reviews</h2>
-          <ProductReviews productId={product.id!} reviews={mockReviews} />
+          <h2 className="text-3xl font-outfit font-bold text-forest-700 mb-8">
+            Customer Reviews
+          </h2>
+          <ProductReviews productId={product._id} />
         </div>
 
         {/* Recommendations */}
         <div className="mb-16">
-          <ProductRecommendations currentProductId={product.id} userId={user?._id} />
+          <ProductRecommendations
+            currentProductId={product._id}
+            userId={user?._id}
+          />
         </div>
       </div>
 

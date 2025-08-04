@@ -1,18 +1,24 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { protect } = require('../middleware/authMiddleware');
+const { protect } = require("../middleware/authMiddleware");
 const {
-    getUserProfile,
-    updateUserProfile,
-    getWishlist,
-    addToWishlist,
-    removeFromWishlist
-} = require('../controllers/userController');
+  getUserProfile,
+  updateUserProfile,
+  addToWishlist,
+  removeFromWishlist,
+  getWishlist,
+} = require("../controllers/userController");
 
-router.get('/me', protect, getUserProfile);
-router.put('/me', protect, updateUserProfile);
-router.get('/wishlist', protect, getWishlist);
-router.post('/wishlist/:productId', protect, addToWishlist);
-router.delete('/wishlist/:productId', protect, removeFromWishlist);
+router
+  .route("/profile")
+  .get(protect, getUserProfile)
+  .put(protect, updateUserProfile);
+
+router.route("/wishlist").get(protect, getWishlist);
+
+router
+  .route("/wishlist/:productId")
+  .post(protect, addToWishlist)
+  .delete(protect, removeFromWishlist);
 
 module.exports = router;

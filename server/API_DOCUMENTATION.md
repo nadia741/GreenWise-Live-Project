@@ -1,18 +1,21 @@
 # GreenWise API Documentation
 
 ## Base URL
+
 ```
-http://localhost:5000/api
+http://localhost:5001/api
 ```
 
 ## Authentication
 
 ### Register User
+
 ```http
 POST /auth/register
 ```
 
 **Request Body:**
+
 ```json
 {
   "name": "string",
@@ -22,6 +25,7 @@ POST /auth/register
 ```
 
 **Response:** (201 Created)
+
 ```json
 {
   "_id": "string",
@@ -32,11 +36,13 @@ POST /auth/register
 ```
 
 ### Login User
+
 ```http
 POST /auth/login
 ```
 
 **Request Body:**
+
 ```json
 {
   "email": "string",
@@ -45,6 +51,7 @@ POST /auth/login
 ```
 
 **Response:** (200 OK)
+
 ```json
 {
   "_id": "string",
@@ -59,11 +66,13 @@ POST /auth/login
 All these endpoints require Authentication Header: `Bearer <token>`
 
 ### Get User Profile
+
 ```http
 GET /users/me
 ```
 
 **Response:** (200 OK)
+
 ```json
 {
   "_id": "string",
@@ -84,11 +93,13 @@ GET /users/me
 ```
 
 ### Update User Profile
+
 ```http
 PUT /users/me
 ```
 
 **Request Body:** (all fields optional)
+
 ```json
 {
   "name": "string",
@@ -109,6 +120,7 @@ PUT /users/me
 ```
 
 **Response:** (200 OK)
+
 ```json
 {
   "_id": "string",
@@ -122,11 +134,13 @@ PUT /users/me
 ### Wishlist Operations
 
 #### Get Wishlist
+
 ```http
 GET /users/wishlist
 ```
 
 **Response:** (200 OK)
+
 ```json
 [
   {
@@ -140,11 +154,13 @@ GET /users/wishlist
 ```
 
 #### Add to Wishlist
+
 ```http
 POST /users/wishlist/:productId
 ```
 
 **Response:** (200 OK)
+
 ```json
 [
   "string" // Array of product IDs
@@ -152,11 +168,13 @@ POST /users/wishlist/:productId
 ```
 
 #### Remove from Wishlist
+
 ```http
 DELETE /users/wishlist/:productId
 ```
 
 **Response:** (200 OK)
+
 ```json
 [
   "string" // Array of remaining product IDs
@@ -166,11 +184,13 @@ DELETE /users/wishlist/:productId
 ## Products
 
 ### Get All Products
+
 ```http
 GET /products
 ```
 
 **Query Parameters:**
+
 - `search`: string (search in name and description)
 - `category`: string
 - `minPrice`: number
@@ -178,6 +198,7 @@ GET /products
 - `minSustainabilityScore`: number (0-10)
 
 **Response:** (200 OK)
+
 ```json
 [
   {
@@ -197,11 +218,13 @@ GET /products
 ```
 
 ### Get Single Product
+
 ```http
 GET /products/:id
 ```
 
 **Response:** (200 OK)
+
 ```json
 {
   "_id": "string",
@@ -219,11 +242,13 @@ GET /products/:id
 ```
 
 ### Create Product (Admin Only)
+
 ```http
 POST /products
 ```
 
 **Request Body:**
+
 ```json
 {
   "name": "string",
@@ -238,11 +263,13 @@ POST /products
 ```
 
 ### Update Product (Admin Only)
+
 ```http
 PUT /products/:id
 ```
 
 **Request Body:** (all fields optional)
+
 ```json
 {
   "name": "string",
@@ -257,6 +284,7 @@ PUT /products/:id
 ```
 
 ### Delete Product (Admin Only)
+
 ```http
 DELETE /products/:id
 ```
@@ -264,11 +292,13 @@ DELETE /products/:id
 ## Reviews
 
 ### Get Product Reviews
+
 ```http
 GET /reviews/:productId
 ```
 
 **Response:** (200 OK)
+
 ```json
 [
   {
@@ -285,11 +315,13 @@ GET /reviews/:productId
 ```
 
 ### Create Review
+
 ```http
 POST /reviews/:productId
 ```
 
 **Request Body:**
+
 ```json
 {
   "rating": "number",
@@ -298,6 +330,7 @@ POST /reviews/:productId
 ```
 
 **Response:** (201 Created)
+
 ```json
 {
   "_id": "string",
@@ -310,11 +343,13 @@ POST /reviews/:productId
 ```
 
 ### Update Review
+
 ```http
 PUT /reviews/:productId/:reviewId
 ```
 
 **Request Body:**
+
 ```json
 {
   "rating": "number",
@@ -323,6 +358,7 @@ PUT /reviews/:productId/:reviewId
 ```
 
 ### Delete Review
+
 ```http
 DELETE /reviews/:productId/:reviewId
 ```
@@ -330,11 +366,13 @@ DELETE /reviews/:productId/:reviewId
 ## Orders
 
 ### Create Order
+
 ```http
 POST /orders
 ```
 
 **Request Body:**
+
 ```json
 {
   "orderItems": [
@@ -357,6 +395,7 @@ POST /orders
 ```
 
 **Response:** (201 Created)
+
 ```json
 {
   "_id": "string",
@@ -370,11 +409,13 @@ POST /orders
 ```
 
 ### Get Order by ID
+
 ```http
 GET /orders/:id
 ```
 
 **Response:** (200 OK)
+
 ```json
 {
   "_id": "string",
@@ -405,11 +446,13 @@ GET /orders/:id
 ```
 
 ### Get User Orders
+
 ```http
 GET /orders
 ```
 
 **Response:** (200 OK)
+
 ```json
 [
   {
@@ -424,11 +467,13 @@ GET /orders
 ```
 
 ### Update Order Status (Admin Only)
+
 ```http
 PUT /orders/:id/status
 ```
 
 **Request Body:**
+
 ```json
 {
   "status": "string" // "pending" | "processing" | "shipped" | "delivered"
@@ -438,6 +483,7 @@ PUT /orders/:id/status
 ## Error Responses
 
 ### 400 Bad Request
+
 ```json
 {
   "message": "Error message describing the issue"
@@ -445,6 +491,7 @@ PUT /orders/:id/status
 ```
 
 ### 401 Unauthorized
+
 ```json
 {
   "message": "Not authorized, no token"
@@ -452,6 +499,7 @@ PUT /orders/:id/status
 ```
 
 ### 404 Not Found
+
 ```json
 {
   "message": "Resource not found"
@@ -461,6 +509,7 @@ PUT /orders/:id/status
 ## Authentication
 
 For protected routes, include the JWT token in the Authorization header:
+
 ```
 Authorization: Bearer <your-token>
 ```

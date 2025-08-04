@@ -1,33 +1,32 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, Leaf, Heart, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/contexts/auth/useAuth';
-import { useCart } from '@/contexts/CartContext';
-import { useRewards } from '@/contexts/RewardsContext';
-import { getSpellingSuggestions } from '@/utils/spellCheck';
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/auth/useAuth";
+import { useCart } from "@/hooks/useCart";
+import { getSpellingSuggestions } from "@/utils/spellCheck";
+import { Leaf, LogOut, Menu, Search, ShoppingCart, User } from "lucide-react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Header = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
-  const { getCartItemsCount, getWishlistItemsCount } = useCart();
+  const { getCartItemCount, wishlistItems } = useCart();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
+      setSearchQuery("");
       setSearchSuggestions([]);
     }
   };
@@ -43,19 +42,22 @@ const Header = () => {
   };
 
   const applySuggestion = (suggestion: string) => {
-    const newQuery = searchQuery.split(' ').map(word => {
-      const suggestions = getSpellingSuggestions(word);
-      return suggestions.includes(suggestion) ? suggestion : word;
-    }).join(' ');
+    const newQuery = searchQuery
+      .split(" ")
+      .map((word) => {
+        const suggestions = getSpellingSuggestions(word);
+        return suggestions.includes(suggestion) ? suggestion : word;
+      })
+      .join(" ");
     setSearchQuery(newQuery);
     setSearchSuggestions([]);
   };
 
   const navigationLinks = [
-    { href: '/products', label: 'Products' },
-    { href: '/about', label: 'About' },
-    { href: '/blog', label: 'Blog' },
-    { href: '/impact', label: 'Impact' }
+    { href: "/products", label: "Products" },
+    { href: "/about", label: "About" },
+    { href: "/blog", label: "Blog" },
+    { href: "/impact", label: "Impact" },
   ];
 
   return (
@@ -63,7 +65,10 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group hover-scale">
+          <Link
+            to="/"
+            className="flex items-center space-x-3 group hover-scale"
+          >
             <div className="relative">
               <div className="w-10 h-10 bg-gradient-to-br from-tree-500 to-forest-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
                 <Leaf className="h-6 w-6 text-white" />
@@ -74,7 +79,9 @@ const Header = () => {
               <h1 className="text-2xl font-outfit font-bold text-forest-700">
                 Green<span className="text-tree-600">Wise</span>
               </h1>
-              <p className="text-xs text-sage-500 leading-none">Sustainable Marketplace</p>
+              <p className="text-xs text-sage-500 leading-none">
+                Sustainable Marketplace
+              </p>
             </div>
           </Link>
 
@@ -110,18 +117,22 @@ const Header = () => {
                 Search
               </Button>
             </form>
-            
+
             {/* Search Suggestions */}
             {searchSuggestions.length > 0 && (
               <div className="absolute top-full left-0 right-0 bg-white border border-sage-200 rounded-lg shadow-lg mt-1 z-50 animate-fade-in">
-                <div className="p-2 text-sm text-sage-600 border-b">Suggestions:</div>
+                <div className="p-2 text-sm text-sage-600 border-b">
+                  Suggestions:
+                </div>
                 {searchSuggestions.map((suggestion, index) => (
                   <button
                     key={index}
                     onClick={() => {
                       setSearchQuery(suggestion);
                       setSearchSuggestions([]);
-                      navigate(`/products?search=${encodeURIComponent(suggestion)}`);
+                      navigate(
+                        `/products?search=${encodeURIComponent(suggestion)}`
+                      );
                     }}
                     className="w-full text-left px-3 py-2 hover:bg-tree-50 text-tree-600"
                   >
@@ -140,15 +151,16 @@ const Header = () => {
               size="sm"
               className="md:hidden text-sage-600 hover:text-tree-600"
               onClick={() => {
-                const query = prompt('Search for products...');
+                const query = prompt("Search for products...");
                 if (query?.trim()) {
-                  navigate(`/products?search=${encodeURIComponent(query.trim())}`);
+                  navigate(
+                    `/products?search=${encodeURIComponent(query.trim())}`
+                  );
                 }
               }}
             >
               <Search className="h-5 w-5" />
             </Button>
-
 
             {/* Cart */}
             <Link to="/cart">
@@ -158,10 +170,12 @@ const Header = () => {
                 className="flex items-center space-x-2 text-sage-600 hover:text-tree-600 relative hover-scale"
               >
                 <ShoppingCart className="h-5 w-5" />
-                <span className="hidden lg:inline text-sm font-medium">Cart</span>
-                {getCartItemsCount() > 0 && (
+                <span className="hidden lg:inline text-sm font-medium">
+                  Cart
+                </span>
+                {getCartItemCount() > 0 && (
                   <span className="absolute -top-1 -right-1 bg-tree-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-bounce">
-                    {getCartItemsCount()}
+                    {getCartItemCount()}
                   </span>
                 )}
               </Button>
@@ -177,11 +191,14 @@ const Header = () => {
                 >
                   <User className="h-5 w-5" />
                   <span className="hidden lg:inline text-sm font-medium">
-                    {isAuthenticated ? user?.name : 'Account'}
+                    {isAuthenticated ? user?.name : "Account"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-white/95 backdrop-blur-md border border-sage-200">
+              <DropdownMenuContent
+                align="end"
+                className="w-48 bg-white/95 backdrop-blur-md border border-sage-200"
+              >
                 {isAuthenticated ? (
                   <>
                     <DropdownMenuItem asChild>
@@ -191,7 +208,10 @@ const Header = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="flex items-center">
+                    <DropdownMenuItem
+                      onClick={logout}
+                      className="flex items-center"
+                    >
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
                     </DropdownMenuItem>

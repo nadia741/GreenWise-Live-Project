@@ -1,28 +1,32 @@
 # GreenWise API Documentation v1.0
 
 ## Base URL
+
 ```
-http://localhost:5000
+http://localhost:5001
 ```
 
 ## Getting Started
 
 1. Install dependencies:
+
 ```bash
 cd server
 npm install
 ```
 
 2. Create a `.env` file with:
+
 ```env
 NODE_ENV=development
-PORT=5000
+PORT=5001
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
 JWT_EXPIRE=30d
 ```
 
 3. Start the server:
+
 ```bash
 npm run dev
 ```
@@ -30,11 +34,13 @@ npm run dev
 ## Authentication Endpoints
 
 ### Register User
+
 ```http
 POST /api/auth/register
 ```
 
 **Request Body:**
+
 ```json
 {
   "name": "John Doe",
@@ -44,6 +50,7 @@ POST /api/auth/register
 ```
 
 **Success Response:** (201 Created)
+
 ```json
 {
   "_id": "user_id",
@@ -54,13 +61,17 @@ POST /api/auth/register
 ```
 
 **Error Responses:**
+
 - Email already exists (400):
+
 ```json
 {
   "message": "User already exists"
 }
 ```
+
 - Invalid data (400):
+
 ```json
 {
   "message": "Invalid user data"
@@ -68,11 +79,13 @@ POST /api/auth/register
 ```
 
 ### Login User
+
 ```http
 POST /api/auth/login
 ```
 
 **Request Body:**
+
 ```json
 {
   "email": "john@example.com",
@@ -81,6 +94,7 @@ POST /api/auth/login
 ```
 
 **Success Response:** (200 OK)
+
 ```json
 {
   "_id": "user_id",
@@ -91,7 +105,9 @@ POST /api/auth/login
 ```
 
 **Error Response:**
+
 - Invalid credentials (401):
+
 ```json
 {
   "message": "Invalid email or password"
@@ -101,16 +117,19 @@ POST /api/auth/login
 ## Product Endpoints
 
 ### Create Product
+
 ```http
 POST /api/products
 ```
 
 **Headers Required:**
+
 ```
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Request Body:**
+
 ```json
 {
   "name": "Eco-Friendly Water Bottle",
@@ -118,17 +137,14 @@ Authorization: Bearer YOUR_JWT_TOKEN
   "price": 29.99,
   "category": "accessories", // as enum: ['general', 'food', 'clothing', 'electronics', 'home', 'accessories'],
   "image": "http://example.com/image.jpg",
-  "sustainabilityScore": 9,  // Must be between 0 and 10
+  "sustainabilityScore": 9, // Must be between 0 and 10
   "inventory": 100,
-  "sustainabilityFeatures": [
-    "Recyclable",
-    "BPA-free",
-    "Long-lasting"
-  ]
+  "sustainabilityFeatures": ["Recyclable", "BPA-free", "Long-lasting"]
 }
 ```
 
 **Success Response:** (201 Created)
+
 ```json
 {
   "_id": "product_id",
@@ -148,13 +164,17 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Error Responses:**
+
 - Validation Error (400):
+
 ```json
 {
   "message": "Product validation failed: sustainabilityScore: Path 'sustainabilityScore' (30) is more than maximum allowed value (10)."
 }
 ```
+
 - Unauthorized (401):
+
 ```json
 {
   "message": "Not authorized, no token"
@@ -162,11 +182,13 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 ### Get All Products
+
 ```http
 GET /api/products
 ```
 
 **Query Parameters:**
+
 - `search` (string): Search in name and description
 - `category` (string): Filter by category
 - `minPrice` (number): Minimum price
@@ -174,11 +196,13 @@ GET /api/products
 - `minSustainabilityScore` (number): Minimum sustainability score (0-10)
 
 **Example:**
+
 ```
 GET /api/products?category=Accessories&minPrice=20&maxPrice=50&minSustainabilityScore=8
 ```
 
 **Success Response:** (200 OK)
+
 ```json
 [
   {
@@ -200,16 +224,19 @@ GET /api/products?category=Accessories&minPrice=20&maxPrice=50&minSustainability
 ## Order Endpoints
 
 ### Create Order
+
 ```http
 POST /api/orders
 ```
 
 **Headers Required:**
+
 ```
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Request Body:**
+
 ```json
 {
   "orderItems": [
@@ -232,6 +259,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Success Response:** (201 Created)
+
 ```json
 {
   "_id": "order_id",
@@ -258,13 +286,17 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Error Responses:**
+
 - Insufficient inventory (400):
+
 ```json
 {
   "message": "Not enough inventory for Eco-Friendly Water Bottle"
 }
 ```
+
 - No order items (400):
+
 ```json
 {
   "message": "No order items"
@@ -274,24 +306,28 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ## Review Endpoints
 
 ### Create Review
+
 ```http
 POST /api/reviews/:productId
 ```
 
 **Headers Required:**
+
 ```
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Request Body:**
+
 ```json
 {
-  "rating": 5,  // Must be between 1 and 5
+  "rating": 5, // Must be between 1 and 5
   "comment": "Great eco-friendly product!"
 }
 ```
 
 **Success Response:** (201 Created)
+
 ```json
 {
   "_id": "review_id",
@@ -304,13 +340,17 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Error Responses:**
+
 - Already reviewed (400):
+
 ```json
 {
   "message": "Product already reviewed"
 }
 ```
+
 - Invalid rating (400):
+
 ```json
 {
   "message": "Rating must be between 1 and 5"
@@ -320,16 +360,19 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ## User Management
 
 ### Get User Profile
+
 ```http
 GET /api/users/me
 ```
 
 **Headers Required:**
+
 ```
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Success Response:** (200 OK)
+
 ```json
 {
   "_id": "user_id",
@@ -350,16 +393,19 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 ### Update Profile
+
 ```http
 PUT /api/users/me
 ```
 
 **Headers Required:**
+
 ```
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Request Body:** (all fields optional)
+
 ```json
 {
   "name": "John Doe Updated",
@@ -380,6 +426,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Success Response:** (200 OK)
+
 ```json
 {
   "_id": "user_id",
@@ -402,25 +449,27 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ## Wishlist Management
 
 ### Add to Wishlist
+
 ```http
 POST /api/users/wishlist/:productId
 ```
 
 **Headers Required:**
+
 ```
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Success Response:** (200 OK)
+
 ```json
-[
-  "product_id_1",
-  "product_id_2"
-]
+["product_id_1", "product_id_2"]
 ```
 
 **Error Response:**
+
 - Already in wishlist (400):
+
 ```json
 {
   "message": "Product already in wishlist"
@@ -428,16 +477,19 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 ### Get Wishlist
+
 ```http
 GET /api/users/wishlist
 ```
 
 **Headers Required:**
+
 ```
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Success Response:** (200 OK)
+
 ```json
 [
   {
@@ -453,7 +505,9 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ## General Error Responses
 
 ### Authentication Errors
+
 - No Token (401):
+
 ```json
 {
   "message": "Not authorized, no token"
@@ -461,6 +515,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 - Invalid Token (401):
+
 ```json
 {
   "message": "Not authorized, token failed"
@@ -468,6 +523,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 ### Validation Errors (400)
+
 ```json
 {
   "message": "Validation error message",
@@ -478,6 +534,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 ### Not Found (404)
+
 ```json
 {
   "message": "Resource not found"
@@ -485,6 +542,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 ### Server Error (500)
+
 ```json
 {
   "message": "Server Error",
@@ -495,18 +553,21 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ## Testing the API
 
 You can test the API using tools like:
+
 - Postman
 - cURL
 - Thunder Client (VS Code Extension)
 
 Example cURL command for login:
+
 ```bash
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST http://localhost:5001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"john@example.com","password":"password123"}'
 ```
 
 Remember to:
+
 1. Save the JWT token from login/register response
 2. Include the token in the Authorization header for protected routes
 3. Follow the validation rules for each endpoint

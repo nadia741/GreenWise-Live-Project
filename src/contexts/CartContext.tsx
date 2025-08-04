@@ -1,196 +1,320 @@
+import { useAuth } from "@/contexts/auth";
+import { api, Product, Order } from "@/services/api";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { useToast } from '@/hooks/use-toast';
-
-interface CartItem {
+export interface CartItem {
   id: string;
   name: string;
   price: number;
+  image: string;
   quantity: number;
-  image: string;
-}
-
-interface WishlistItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-}
-
-interface Order {
-  id: string;
-  date: string;
-  items: CartItem[];
-  total: number;
-  status: string;
-  shippingAddress: string;
 }
 
 interface CartContextType {
   cartItems: CartItem[];
-  wishlistItems: WishlistItem[];
+  wishlistItems: Product[];
+  wishlistLoading: boolean;
   orderHistory: Order[];
-  addToCart: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
+  orderLoading: boolean;
+  addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
-  addToWishlist: (item: WishlistItem) => void;
-  removeFromWishlist: (id: string) => void;
   clearCart: () => void;
   getCartTotal: () => number;
-  getCartItemsCount: () => number;
-  getWishlistItemsCount: () => number;
+  getCartItemCount: () => number;
   getOrderCount: () => number;
-  completeOrder: (shippingInfo: any) => void;
+  addToWishlist: (item: Product) => Promise<void>;
+  removeFromWishlist: (id: string) => Promise<void>;
+  isInWishlist: (id: string) => boolean;
+  createOrder: (shippingAddress: {
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country?: string;
+  }) => Promise<Order>;
+  refreshOrders: () => Promise<void>;
 }
+
+export type { CartContextType };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
-  const [orderHistory, setOrderHistory] = useState<Order[]>([]);
-  const { toast } = useToast();
+export { CartContext };
 
-  const addToCart = (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
-    const quantityToAdd = item.quantity || 1;
-    setCartItems(prev => {
-      const existingItem = prev.find(cartItem => cartItem.id === item.id);
+export const CartProvider = ({ children }: { children: ReactNode }) => {
+  const { user } = useAuth();
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [orderHistory, setOrderHistory] = useState<Order[]>([]);
+  const [orderLoading, setOrderLoading] = useState(false);
+
+  // Load cart from localStorage on component mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem("greenwise_cart");
+    if (savedCart) {
+      try {
+        setCartItems(JSON.parse(savedCart));
+      } catch (error) {
+        console.error("Error parsing cart from localStorage:", error);
+        localStorage.removeItem("greenwise_cart");
+      }
+    }
+  }, []);
+
+  // Save cart to localStorage whenever cartItems changes
+  useEffect(() => {
+    localStorage.setItem("greenwise_cart", JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  // Load wishlist from database when user changes
+  useEffect(() => {
+    const loadWishlist = async () => {
+      if (user?.token) {
+        try {
+          setWishlistLoading(true);
+          const wishlist = await api.wishlist.getWishlist(user.token);
+          setWishlistItems(wishlist || []);
+        } catch (error) {
+          console.error("Error loading wishlist:", error);
+          setWishlistItems([]);
+        } finally {
+          setWishlistLoading(false);
+        }
+      } else {
+        setWishlistItems([]);
+        setWishlistLoading(false);
+      }
+    };
+
+    loadWishlist();
+  }, [user]);
+
+  // Load orders from database when user changes
+  useEffect(() => {
+    const loadOrders = async () => {
+      if (user?.token) {
+        try {
+          setOrderLoading(true);
+          const orders = await api.orders.getUserOrders(user.token);
+          setOrderHistory(orders || []);
+        } catch (error) {
+          console.error("Error loading orders:", error);
+          setOrderHistory([]);
+        } finally {
+          setOrderLoading(false);
+        }
+      } else {
+        setOrderHistory([]);
+        setOrderLoading(false);
+      }
+    };
+
+    loadOrders();
+  }, [user]);
+
+  // Load order history from database when user changes
+  useEffect(() => {
+    const loadOrders = async () => {
+      if (user?.token) {
+        try {
+          setOrderLoading(true);
+          const orders = await api.orders.getUserOrders(user.token);
+          setOrderHistory(orders || []);
+        } catch (error) {
+          console.error("Error loading order history:", error);
+          setOrderHistory([]);
+        } finally {
+          setOrderLoading(false);
+        }
+      } else {
+        setOrderHistory([]);
+        setOrderLoading(false);
+      }
+    };
+
+    loadOrders();
+  }, [user]);
+
+  // Cart functions (localStorage-based)
+  const addToCart = (item: CartItem) => {
+    setCartItems((prev) => {
+      const existingItem = prev.find((cartItem) => cartItem.id === item.id);
+
       if (existingItem) {
-        return prev.map(cartItem =>
+        return prev.map((cartItem) =>
           cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + quantityToAdd }
+            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
             : cartItem
         );
       }
-      return [...prev, { 
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        image: item.image,
-        quantity: quantityToAdd 
-      }];
-    });
 
-    toast({
-      title: "🛒 Added to Cart!",
-      description: `${item.name} has been added to your cart.`,
-      duration: 3000,
-    });
-  };
-
-  const removeFromCart = (id: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
-    toast({
-      title: "Removed from Cart",
-      description: "Item removed from your cart.",
-      duration: 2000,
-    });
-  };
-
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity === 0) {
-      removeFromCart(id);
-      return;
-    }
-    
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const addToWishlist = (item: WishlistItem) => {
-    setWishlistItems(prev => {
-      const exists = prev.find(wishItem => wishItem.id === item.id);
-      if (exists) {
-        toast({
-          title: "Already in Wishlist",
-          description: "This item is already in your wishlist.",
-          duration: 2000,
-        });
-        return prev;
-      }
-      toast({
-        title: "❤️ Added to Wishlist!",
-        description: `${item.name} has been saved for later.`,
-        duration: 3000,
-      });
       return [...prev, item];
     });
   };
 
-  const removeFromWishlist = (id: string) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== id));
-    toast({
-      title: "💔 Removed from Wishlist",
-      description: "Item removed from your wishlist.",
-      duration: 2000,
-    });
+  const removeFromCart = (id: string) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const updateQuantity = (id: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(id);
+      return;
+    }
+
+    setCartItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+    );
   };
 
   const clearCart = () => {
     setCartItems([]);
   };
 
-  const completeOrder = (shippingInfo: any) => {
-    const orderNumber = `GW${Date.now().toString().slice(-8)}`;
-    const newOrder: Order = {
-      id: orderNumber,
-      date: new Date().toLocaleDateString(),
-      items: [...cartItems],
-      total: getCartTotal(),
-      status: 'processing',
-      shippingAddress: `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.zip}`
-    };
-    
-    setOrderHistory(prev => [newOrder, ...prev]);
-    clearCart();
-    return orderNumber;
+  const getCartTotal = () => {
+    return cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+  };
+
+  const getCartItemCount = () => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
   const getOrderCount = () => {
     return orderHistory.length;
   };
 
-  const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  // Order functions (database-based, requires authentication)
+  const createOrder = async (shippingAddress: {
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country?: string;
+  }): Promise<Order> => {
+    if (!user?.token) {
+      throw new Error("Please sign in to place an order");
+    }
+
+    if (cartItems.length === 0) {
+      throw new Error("Your cart is empty");
+    }
+
+    try {
+      const orderData = {
+        orderItems: cartItems.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          image: item.image,
+          price: item.price,
+          product: item.id, // Using the product ID
+        })),
+        shippingAddress: {
+          address: shippingAddress.address,
+          city: shippingAddress.city,
+          postalCode: shippingAddress.zipCode,
+          country: shippingAddress.country || "United States",
+        },
+        totalPrice: getCartTotal(),
+      };
+
+      const order = await api.orders.createOrder(orderData, user.token);
+
+      // Clear cart after successful order
+      clearCart();
+
+      // Refresh order history
+      await refreshOrders();
+
+      return order;
+    } catch (error) {
+      console.error("Error creating order:", error);
+      throw error;
+    }
   };
 
-  const getCartItemsCount = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  const refreshOrders = async () => {
+    if (!user?.token) return;
+
+    try {
+      setOrderLoading(true);
+      const orders = await api.orders.getUserOrders(user.token);
+      setOrderHistory(orders || []);
+    } catch (error) {
+      console.error("Error refreshing orders:", error);
+    } finally {
+      setOrderLoading(false);
+    }
   };
 
-  const getWishlistItemsCount = () => {
-    return wishlistItems.length;
+  // Wishlist functions (database-based, requires authentication)
+  const addToWishlist = async (item: Product) => {
+    if (!user?.token) {
+      throw new Error("Please sign in to add items to your wishlist");
+    }
+
+    try {
+      const updatedWishlist = await api.wishlist.addToWishlist(
+        item._id,
+        user.token
+      );
+      setWishlistItems(updatedWishlist || []);
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+      throw error;
+    }
   };
 
-  return (
-    <CartContext.Provider value={{
-      cartItems,
-      wishlistItems,
-      orderHistory,
-      addToCart,
-      removeFromCart,
-      updateQuantity,
-      addToWishlist,
-      removeFromWishlist,
-      clearCart,
-      getCartTotal,
-      getCartItemsCount,
-      getWishlistItemsCount,
-      getOrderCount,
-      completeOrder
-    }}>
-      {children}
-    </CartContext.Provider>
-  );
-};
+  const removeFromWishlist = async (id: string) => {
+    if (!user?.token) {
+      throw new Error("Please sign in to manage your wishlist");
+    }
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
+    try {
+      const updatedWishlist = await api.wishlist.removeFromWishlist(
+        id,
+        user.token
+      );
+      setWishlistItems(updatedWishlist || []);
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      throw error;
+    }
+  };
+
+  const isInWishlist = (id: string) => {
+    return wishlistItems.some((item) => item._id === id);
+  };
+
+  const value: CartContextType = {
+    cartItems,
+    wishlistItems,
+    wishlistLoading,
+    orderHistory,
+    orderLoading,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    getCartTotal,
+    getCartItemCount,
+    getOrderCount,
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist,
+    createOrder,
+    refreshOrders,
+  };
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };

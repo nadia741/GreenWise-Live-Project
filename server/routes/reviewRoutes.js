@@ -1,19 +1,26 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { protect } = require('../middleware/authMiddleware');
+const { protect } = require("../middleware/authMiddleware");
 const {
-    createReview,
-    getProductReviews,
-    updateReview,
-    deleteReview
-} = require('../controllers/reviewController');
+  createReview,
+  getProductReviews,
+  getRecentReviews,
+  updateReview,
+  deleteReview,
+} = require("../controllers/reviewController");
 
-router.route('/:productId')
-    .get(getProductReviews)
-    .post(protect, createReview);
+// Get recent reviews for homepage - must come before parameterized routes
+router.get("/recent/:limit", getRecentReviews);
 
-router.route('/:productId/:reviewId')
-    .put(protect, updateReview)
-    .delete(protect, deleteReview);
+// Product-specific review routes
+router
+  .route("/product/:productId")
+  .get(getProductReviews)
+  .post(protect, createReview);
+
+router
+  .route("/product/:productId/:reviewId")
+  .put(protect, updateReview)
+  .delete(protect, deleteReview);
 
 module.exports = router;

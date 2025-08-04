@@ -1,259 +1,214 @@
-
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import ProductCard from './ProductCard';
+import { api, Product } from "@/services/api";
+import { AlertCircle, ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
+import ProductCard from "./ProductCard";
+import { Button } from "./ui/button";
 
 const FeaturedProducts = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const productsPerPage = 8;
 
-  // Enhanced product data with more products
-  const allProducts = [
-    {
-      id: '1',
-      name: 'Organic Cotton Classic T-Shirt',
-      price: 28.99,
-      originalPrice: 39.99,
-      rating: 4.8,
-      reviews: 324,
-      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 95,
-      certifications: ['GOTS Certified', 'Fair Trade', 'Carbon Neutral'],
-      carbonFootprint: '2.1kg CO₂ saved',
-      isNew: true,
-      description: 'Ultra-soft organic cotton tee made from sustainably grown cotton. Perfect for everyday wear with a conscience.',
-    },
-    {
-      id: '2',
-      name: 'Bamboo Athletic Performance Set',
-      price: 78.00,
-      rating: 4.9,
-      reviews: 189,
-      image: 'https://images.unsplash.com/photo-1506629905138-c3d9db2cd4b0?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 88,
-      certifications: ['OEKO-TEX Standard', 'Cradle to Cradle'],
-      carbonFootprint: '3.4kg CO₂ saved',
-      isBestseller: true,
-      description: 'Moisture-wicking bamboo fiber activewear that keeps you cool and comfortable during workouts.',
-    },
-    {
-      id: '3',
-      name: 'Insulated Stainless Steel Water Bottle',
-      price: 32.50,
-      originalPrice: 45.00,
-      rating: 4.7,
-      reviews: 512,
-      image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 92,
-      certifications: ['BPA-Free', '100% Recyclable'],
-      carbonFootprint: '0.8kg CO₂ saved',
-      description: 'Double-wall vacuum insulation keeps drinks cold for 24hrs or hot for 12hrs. Made from premium stainless steel.',
-    },
-    {
-      id: '4',
-      name: 'Natural Hemp Rope Dog Toy',
-      price: 16.99,
-      rating: 4.6,
-      reviews: 267,
-      image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 85,
-      certifications: ['100% Natural', 'Non-Toxic'],
-      carbonFootprint: '0.5kg CO₂ saved',
-      description: 'Durable hemp rope toy that\'s safe for pets and biodegradable. Hours of eco-friendly fun for your furry friend.',
-    },
-    {
-      id: '5',
-      name: 'Bamboo Kitchen Utensil Set',
-      price: 34.00,
-      rating: 4.8,
-      reviews: 198,
-      image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 90,
-      certifications: ['FSC Certified', 'Plastic-Free'],
-      carbonFootprint: '1.2kg CO₂ saved',
-      description: 'Complete 6-piece bamboo kitchen set including spatulas, spoons, and serving utensils. Naturally antimicrobial.',
-    },
-    {
-      id: '6',
-      name: 'Zero Waste Shampoo Bar',
-      price: 14.99,
-      rating: 4.5,
-      reviews: 445,
-      image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 87,
-      certifications: ['Cruelty-Free', 'Vegan', 'Plastic-Free'],
-      carbonFootprint: '0.2kg CO₂ saved',
-      description: 'Concentrated shampoo bar with natural ingredients. One bar equals 2-3 bottles of liquid shampoo.',
-    },
-    {
-      id: '7',
-      name: 'Recycled Canvas Weekend Tote',
-      price: 42.00,
-      rating: 4.7,
-      reviews: 156,
-      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 88,
-      certifications: ['Recycled Materials', 'Fair Trade'],
-      carbonFootprint: '1.8kg CO₂ saved',
-      description: 'Spacious tote bag made from recycled canvas with reinforced handles. Perfect for shopping or travel.',
-    },
-    {
-      id: '8',
-      name: 'Organic Baby Care Essential Kit',
-      price: 52.99,
-      rating: 4.9,
-      reviews: 123,
-      image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 95,
-      certifications: ['USDA Organic', 'Hypoallergenic'],
-      carbonFootprint: '1.1kg CO₂ saved',
-      isNew: true,
-      description: 'Complete organic baby care set with gentle lotions, soaps, and accessories. Safe for sensitive skin.',
-    },
-    // Additional products for page 2
-    {
-      id: '9',
-      name: 'Solar LED Garden Lights Set',
-      price: 89.99,
-      originalPrice: 119.99,
-      rating: 4.6,
-      reviews: 289,
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 82,
-      certifications: ['Energy Star', 'Weatherproof'],
-      carbonFootprint: '3.2kg CO₂ saved',
-      description: 'Set of 8 solar-powered LED lights for garden pathways. Automatic dusk-to-dawn operation.',
-    },
-    {
-      id: '10',
-      name: 'Reusable Silicone Food Storage Bags',
-      price: 24.99,
-      rating: 4.4,
-      reviews: 567,
-      image: 'https://images.unsplash.com/photo-1567958100051-3b84b75b3ba1?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 88,
-      certifications: ['BPA-Free', 'Food Grade'],
-      carbonFootprint: '1.5kg CO₂ saved',
-      description: 'Airtight silicone bags that replace single-use plastic. Dishwasher safe and leak-proof.',
-    },
-    {
-      id: '11',
-      name: 'Sustainable Cork Yoga Mat',
-      price: 68.00,
-      rating: 4.7,
-      reviews: 234,
-      image: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 91,
-      certifications: ['Natural Cork', 'Non-Slip'],
-      carbonFootprint: '2.3kg CO₂ saved',
-      description: 'Premium cork yoga mat with natural rubber base. Antimicrobial and provides excellent grip.',
-    },
-    {
-      id: '12',
-      name: 'Organic Cotton Baby Onesies 3-Pack',
-      price: 36.99,
-      rating: 4.8,
-      reviews: 445,
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=500&fit=crop&auto=format',
-      sustainabilityScore: 93,
-      certifications: ['GOTS Certified', 'Hypoallergenic'],
-      carbonFootprint: '0.9kg CO₂ saved',
-      description: 'Soft organic cotton onesies in neutral colors. Perfect for sensitive baby skin.',
-    }
-  ];
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  const totalPages = Math.ceil(allProducts.length / productsPerPage);
+      const data = await api.products.getProducts({
+        page: currentPage.toString(),
+        limit: productsPerPage.toString(),
+      });
+
+      setProducts(data.products || []);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+      setError(
+        "Unable to load products. Please check your connection and try again."
+      );
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [currentPage]);
+
+  const totalPages = Math.ceil(products.length / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
-  const currentProducts = allProducts.slice(startIndex, startIndex + productsPerPage);
+  const displayedProducts = products.slice(
+    startIndex,
+    startIndex + productsPerPage
+  );
 
-  const handleNextPage = () => {
+  const nextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
-  const handlePrevPage = () => {
+  const prevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      setCurrentPage((prev) => prev - 1);
     }
   };
+
+  const retryFetch = () => {
+    fetchProducts();
+  };
+
+  if (loading) {
+    return (
+      <section className="py-20 bg-gradient-to-br from-sage-50 via-cream-50 to-tree-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-forest-600 mx-auto mb-4"></div>
+            <p className="text-forest-600">Loading featured products...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-20 bg-gradient-to-br from-sage-50 via-cream-50 to-tree-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-forest-700 mb-4">
+              Unable to Load Products
+            </h3>
+            <p className="text-sage-600 mb-6 max-w-md mx-auto">{error}</p>
+            <Button
+              onClick={retryFetch}
+              className="bg-forest-600 hover:bg-forest-700 text-white"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <section className="py-20 bg-gradient-to-br from-sage-50 via-cream-50 to-tree-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h3 className="text-xl font-semibold text-forest-700 mb-4">
+              No Products Available
+            </h3>
+            <p className="text-sage-600">
+              Please check back later for new products.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="py-20 bg-gradient-to-b from-sage-50/30 to-tree-50/20">
+    <section className="py-20 bg-gradient-to-br from-sage-50 via-cream-50 to-tree-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Enhanced Header */}
+        {/* Header */}
         <div className="text-center mb-16 animate-fade-in-up">
           <div className="inline-flex items-center gap-2 bg-tree-100 text-tree-700 px-6 py-3 rounded-full text-sm font-semibold mb-6 shadow-lg">
-            <span className="w-2 h-2 bg-tree-500 rounded-full animate-pulse"></span>
-            Featured Sustainable Products
+            🌱 Featured Products
           </div>
           <h2 className="text-5xl font-outfit font-bold text-forest-700 mb-6">
-            Discover Our
-            <span className="block text-tree-600">Eco-Friendly Collection</span>
+            Sustainable Choices for
+            <span className="block text-tree-600">Everyday Living</span>
           </h2>
           <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed">
-            Handpicked sustainable products that make a positive impact on our planet while enhancing your lifestyle
+            Discover eco-friendly products that make a positive impact on our
+            planet while enhancing your lifestyle
           </p>
         </div>
 
-        {/* Enhanced Product Grid */}
+        {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
-          {currentProducts.map((product, index) => (
-            <div 
-              key={product.id}
+          {displayedProducts.map((product, index) => (
+            <div
+              key={product._id}
               className="animate-fade-in-scale"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <ProductCard {...product} />
+              <ProductCard
+                id={product._id}
+                name={product.name}
+                description={product.description}
+                price={product.price}
+                category={product.category}
+                image={product.image}
+                certifications={product.sustainabilityFeatures}
+                sustainabilityScore={product.sustainabilityScore}
+                averageRating={product.averageRating}
+                numReviews={product.numReviews}
+                sustainabilityFeatures={product.sustainabilityFeatures}
+              />
             </div>
           ))}
         </div>
 
-        {/* Enhanced Pagination */}
-        <div className="flex items-center justify-center space-x-6 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
-          <Button
-            variant="outline"
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="flex items-center space-x-2 px-6 py-3 font-semibold border-tree-200 hover:bg-tree-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div
+            className="flex items-center justify-center gap-4 animate-fade-in-up"
+            style={{ animationDelay: "0.5s" }}
           >
-            <ChevronLeft className="h-4 w-4" />
-            <span>Previous</span>
-          </Button>
-          
-          <div className="flex items-center space-x-4">
-            <span className="text-sage-600 font-medium">
-              Page {currentPage} of {totalPages}
-            </span>
-            <div className="flex space-x-2">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`w-10 h-10 rounded-full font-semibold transition-all duration-300 ${
-                    currentPage === i + 1
-                      ? 'bg-tree-600 text-white shadow-lg'
-                      : 'bg-sage-100 text-sage-600 hover:bg-tree-100'
-                  }`}
+            <Button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              variant="outline"
+              className="flex items-center gap-2 border-sage-300 hover:bg-sage-50 disabled:opacity-50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Previous
+            </Button>
+
+            <div className="flex items-center gap-2">
+              {[...Array(totalPages)].map((_, index) => (
+                <Button
+                  key={index}
+                  onClick={() => setCurrentPage(index + 1)}
+                  variant={currentPage === index + 1 ? "default" : "outline"}
+                  className="w-10 h-10"
                 >
-                  {i + 1}
-                </button>
+                  {index + 1}
+                </Button>
               ))}
             </div>
-          </div>
 
+            <Button
+              onClick={nextPage}
+              disabled={currentPage === totalPages}
+              variant="outline"
+              className="flex items-center gap-2 border-sage-300 hover:bg-sage-50 disabled:opacity-50"
+            >
+              Next
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+
+        {/* Call to Action */}
+        <div
+          className="text-center mt-16 animate-fade-in-up"
+          style={{ animationDelay: "0.6s" }}
+        >
           <Button
-            variant="outline"
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="flex items-center space-x-2 px-6 py-3 font-semibold border-tree-200 hover:bg-tree-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+            onClick={() => (window.location.href = "/products")}
+            className="bg-gradient-to-r from-tree-600 to-forest-700 hover:from-tree-700 hover:to-forest-800 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
-            <span>Next</span>
-            <ChevronRight className="h-4 w-4" />
+            Explore All Products
           </Button>
         </div>
-
       </div>
     </section>
   );

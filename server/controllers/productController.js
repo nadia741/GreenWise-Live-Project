@@ -9,7 +9,10 @@ const getProducts = async (req, res) => {
         category, 
         minPrice, 
         maxPrice, 
-        minSustainabilityScore 
+        minSustainabilityScore,
+        page = 1,
+        limit = 8,
+        sustainabilityFeatures
     } = req.query;
 
     let query = {};
@@ -36,8 +39,34 @@ const getProducts = async (req, res) => {
         query.sustainabilityScore = { $gte: Number(minSustainabilityScore) };
     }
 
-    const products = await Product.find(query);
-    res.json(products);
+    // Filter by sustainability features
+    if (sustainabilityFeatures) {
+        const features = Array.isArray(sustainabilityFeatures) 
+            ? sustainabilityFeatures 
+            : [sustainabilityFeatures];
+        query.sustainabilityFeatures = { $in: features };
+    }
+
+    try {
+        // Calculate pagination values
+        const startIndex = (Number(page) - 1) * Number(limit);
+        const totalProducts = await Product.countDocuments(query);
+
+        // Get products with pagination
+        const products = await Product.find(query)
+            .limit(Number(limit))
+            .skip(startIndex)
+            .sort({ createdAt: -1 });
+
+        res.json({
+            products,
+            currentPage: Number(page),
+            totalPages: Math.ceil(totalProducts / Number(limit)),
+            totalProducts,
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching products', error: error.message });
+    }
 };
 
 // @desc    Get single product

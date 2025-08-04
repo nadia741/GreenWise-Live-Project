@@ -13,11 +13,10 @@ interface ProductCardProps {
   name: string;
   price: number;
   originalPrice?: number;
-  rating: number;
-  reviews: number;
+  
   image: string;
   certifications: string[];
-  carbonFootprint: string;
+  
   isNew?: boolean;
   isBestseller?: boolean;
   description?: string;
@@ -29,11 +28,10 @@ const ProductCard = ({
   name,
   price,
   originalPrice,
-  rating,
-  reviews,
+
   image,
   certifications = [], // Default to empty array
-  carbonFootprint,
+ 
   isNew = false,
   isBestseller = false,
   description = "",
@@ -134,6 +132,9 @@ const ProductCard = ({
     navigate(`/product/${id}`);
   };
 
+  console.log(image, 'Product Image URL');
+  
+
   return (
     <div 
       className="group bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-700 overflow-hidden hover:-translate-y-4 cursor-pointer border border-sage-100 hover:border-tree-300 animate-fade-in-scale card-hover h-[500px] flex flex-col"
@@ -206,24 +207,7 @@ const ProductCard = ({
       {/* Content Section */}
       <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
         {/* Rating and Carbon Footprint */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  className={`h-4 w-4 transition-all duration-300 hover:scale-125 ${
-                    i < Math.floor(rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'
-                  }`} 
-                />
-              ))}
-            </div>
-            <span className="text-sm text-gray-500 font-medium">({reviews})</span>
-          </div>
-          <div className="text-xs text-tree-600 font-semibold bg-tree-50 px-3 py-1 rounded-full border border-tree-200 hover:bg-tree-100 transition-colors">
-            {carbonFootprint}
-          </div>
-        </div>
+        
 
         {/* Product Name with shimmer effect */}
         <h3 className="font-outfit font-bold text-forest-700 line-clamp-2 leading-tight text-lg hover:text-tree-600 transition-colors shimmer truncate">

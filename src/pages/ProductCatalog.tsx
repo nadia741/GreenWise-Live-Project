@@ -1,10 +1,8 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import CategoryFilter from '@/components/CategoryFilter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,7 +10,33 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Filter, Grid, List, Search } from 'lucide-react';
-import { products, categories } from '@/data/products';
+
+interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image: string;
+  sustainabilityScore: number;
+  inventory: number;
+  averageRating: number;
+  numReviews: number;
+  sustainabilityFeatures: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ProductCardProps {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image: string;
+  rating: number;
+  certifications: string[];
+}
 
 const ProductCatalog = () => {
   const [searchParams] = useSearchParams();
@@ -20,107 +44,95 @@ const ProductCatalog = () => {
   
   const [filters, setFilters] = useState({
     category: 'all',
-    subcategory: 'all',
     priceRange: [0, 100],
-    certifications: [] as string[],
+    sustainabilityFeatures: [] as string[],
     sortBy: 'featured'
   });
   
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
-  const productsPerPage = 8;
+  const [loading, setLoading] = useState(false);
+  const [productData, setProductData] = useState<{
+    products: Product[];
+    currentPage: number;
+    totalPages: number;
+    totalProducts: number;
+  }>({
+    products: [],
+    currentPage: 1,
+    totalPages: 1,
+    totalProducts: 0
+  });
 
-  const allCategories = [...Object.keys(categories), ...products.map(p => p.category).filter(c => c && !Object.keys(categories).includes(c))].filter((value, index, self) => self.indexOf(value) === index);
-  const allCertifications = [...new Set(products.flatMap(p => p.certifications))];
+  // Static data from our product model
+  const categories = ['general', 'food', 'clothing', 'electronics', 'home', 'accessories'];
+  const sustainabilityFeatures = [
+    "Recyclable",
+    "BPA-free",
+    "Long-lasting",
+    "Locally sourced",
+    "No plastic packaging",
+    "Bee-friendly harvesting",
+    "Solar energy",
+    "Durable materials",
+    "No electricity required",
+    "Plastic-free",
+    "100% compostable",
+    "Zero toxic chemicals",
+    "Vegan",
+    "Biodegradable",
+    "Water-resistant",
+    "Organic ingredients",
+    "Compostable packaging",
+    "No artificial additives",
+    "Cruelty-free",
+    "Plastic-free jar",
+    "Natural ingredients"
+  ];
 
-  const filteredProducts = useMemo(() => {
-    const filtered = products.filter(product => {
-      // Search filter
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        const matchesName = product.name.toLowerCase().includes(query);
-        const matchesDescription = product.description?.toLowerCase().includes(query);
-        const matchesCategory = product.category?.toLowerCase().includes(query);
-        const matchesSubcategory = product.subcategory?.toLowerCase().includes(query);
-        const matchesCertifications = product.certifications.some(cert => 
-          cert.toLowerCase().includes(query)
-        );
-        
-        if (!matchesName && !matchesDescription && !matchesCategory && !matchesSubcategory && !matchesCertifications) {
-          return false;
-        }
-      }
-
-      // Category filter
-      if (filters.category && filters.category !== 'all' && product.category !== filters.category) {
-        return false;
-      }
-
-      // Subcategory filter
-      if (filters.subcategory && filters.subcategory !== 'all' && product.subcategory !== filters.subcategory) {
-        return false;
-      }
-
-      // Price range filter
-      if (product.price < filters.priceRange[0] || product.price > filters.priceRange[1]) {
-        return false;
-      }
-
-      // Certifications filter
-      if (filters.certifications.length > 0) {
-        const hasRequiredCertifications = filters.certifications.every(cert =>
-          product.certifications.includes(cert)
-        );
-        if (!hasRequiredCertifications) {
-          return false;
-        }
-      }
-
-
-      return true;
-    });
-
-    // Apply sorting
-    switch (filters.sortBy) {
-      case 'price-low':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'newest':
-        filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-        break;
-      default: // featured
-        filtered.sort((a, b) => {
-          if (a.isBestseller && !b.isBestseller) return -1;
-          if (!a.isBestseller && b.isBestseller) return 1;
-          if (a.isNew && !b.isNew) return -1;
-          if (!a.isNew && b.isNew) return 1;
-          return b.rating - a.rating;
+  const fetchProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams();
+      
+      if (searchQuery) queryParams.append('search', searchQuery);
+      if (filters.category !== 'all') queryParams.append('category', filters.category);
+      if (filters.sustainabilityFeatures.length > 0) {
+        filters.sustainabilityFeatures.forEach(feature => {
+          queryParams.append('sustainabilityFeatures', feature);
         });
+      }
+      
+      const minPrice = filters.priceRange[0];
+      const maxPrice = filters.priceRange[1];
+      if (minPrice > 0) queryParams.append('minPrice', minPrice.toString());
+      if (maxPrice < 100) queryParams.append('maxPrice', maxPrice.toString());
+      
+      queryParams.append('page', currentPage.toString());
+      queryParams.append('limit', '8');
+
+      const response = await fetch(`/api/products?${queryParams.toString()}`);
+      const data = await response.json();
+      
+      setProductData(data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
     }
+  }, [currentPage, filters, searchQuery]);
 
-    return filtered;
-  }, [searchQuery, filters]);
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * productsPerPage;
-    return filteredProducts.slice(startIndex, startIndex + productsPerPage);
-  }, [filteredProducts, currentPage]);
-
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-
-  const handleCertificationChange = (certification: string, checked: boolean) => {
+  const handleFeatureChange = (feature: string, checked: boolean) => {
     setFilters(prev => ({
       ...prev,
-      certifications: checked
-        ? [...prev.certifications, certification]
-        : prev.certifications.filter(c => c !== certification)
+      sustainabilityFeatures: checked
+        ? [...prev.sustainabilityFeatures, feature]
+        : prev.sustainabilityFeatures.filter(f => f !== feature)
     }));
     setCurrentPage(1);
   };
@@ -128,10 +140,8 @@ const ProductCatalog = () => {
   const clearFilters = () => {
     setFilters({
       category: 'all',
-      subcategory: 'all',
       priceRange: [0, 100],
-      certifications: [],
-      
+      sustainabilityFeatures: [],
       sortBy: 'featured'
     });
     setCurrentPage(1);
@@ -163,22 +173,32 @@ const ProductCatalog = () => {
                 </Button>
               </div>
 
-              {/* Category & Subcategory Filters */}
-              <CategoryFilter
-                selectedCategory={filters.category}
-                selectedSubcategory={filters.subcategory}
-                onCategoryChange={(category) => {
-                  setFilters(prev => ({ ...prev, category, subcategory: 'all' }));
-                  setCurrentPage(1);
-                }}
-                onSubcategoryChange={(subcategory) => {
-                  setFilters(prev => ({ ...prev, subcategory }));
-                  setCurrentPage(1);
-                }}
-              />
+              {/* Category Filter */}
+              <div className="mb-6">
+                <Label className="text-sm font-medium text-forest-700 mb-3 block">Category</Label>
+                <Select
+                  value={filters.category}
+                  onValueChange={(category) => {
+                    setFilters(prev => ({ ...prev, category }));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
               {/* Price Range Filter */}
-              <div className="mb-6 mt-6">
+              <div className="mb-6">
                 <Label className="text-sm font-medium text-forest-700 mb-3 block">
                   Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1]}
                 </Label>
@@ -191,26 +211,24 @@ const ProductCatalog = () => {
                   max={100}
                   min={0}
                   step={5}
-                  className="w-full"
                 />
               </div>
 
-
-              {/* Certifications Filter */}
+              {/* Sustainability Features Filter */}
               <div className="mb-6">
-                <Label className="text-sm font-medium text-forest-700 mb-3 block">Certifications</Label>
-                <div className="space-y-3 max-h-40 overflow-y-auto">
-                  {allCertifications.map(certification => (
-                    <div key={certification} className="flex items-center space-x-2">
+                <Label className="text-sm font-medium text-forest-700 mb-3 block">Sustainability Features</Label>
+                <div className="space-y-3 max-h-60 overflow-y-auto">
+                  {sustainabilityFeatures.map(feature => (
+                    <div key={feature} className="flex items-center space-x-2">
                       <Checkbox
-                        id={certification}
-                        checked={filters.certifications.includes(certification)}
+                        id={feature}
+                        checked={filters.sustainabilityFeatures.includes(feature)}
                         onCheckedChange={(checked) => 
-                          handleCertificationChange(certification, checked as boolean)
+                          handleFeatureChange(feature, checked as boolean)
                         }
                       />
-                      <Label htmlFor={certification} className="text-sm text-sage-600">
-                        {certification}
+                      <Label htmlFor={feature} className="text-sm text-sage-600">
+                        {feature}
                       </Label>
                     </div>
                   ))}
@@ -235,7 +253,7 @@ const ProductCatalog = () => {
                 </Button>
                 
                 <div className="text-sage-600">
-                  {filteredProducts.length} products found
+                  {productData.totalProducts} products found
                 </div>
               </div>
 
@@ -252,7 +270,6 @@ const ProductCatalog = () => {
                     <SelectItem value="price-low">Price: Low to High</SelectItem>
                     <SelectItem value="price-high">Price: High to Low</SelectItem>
                     <SelectItem value="rating">Highest Rated</SelectItem>
-                    
                     <SelectItem value="newest">Newest First</SelectItem>
                   </SelectContent>
                 </Select>
@@ -279,19 +296,33 @@ const ProductCatalog = () => {
             </div>
 
             {/* Products Grid */}
-            {paginatedProducts.length > 0 ? (
+            {loading ? (
+              <div className="text-center py-16">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-forest-600 mx-auto"></div>
+                <p className="mt-4 text-forest-600">Loading products...</p>
+              </div>
+            ) : productData.products.length > 0 ? (
               <div className={`${
                 viewMode === 'grid' 
                   ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8' 
                   : 'space-y-6'
               }`}>
-                {paginatedProducts.map((product, index) => (
+                {productData.products.map((product, index) => (
                   <div
-                    key={product.id}
+                    key={product._id}
                     className="animate-fade-in-scale"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <ProductCard {...product} />
+                    <ProductCard 
+                      id={product._id}
+                      name={product.name}
+                      description={product.description}
+                      price={product.price}
+                      category={product.category}
+                      image={product.image}
+                     
+                      certifications={product.sustainabilityFeatures}
+                    />
                   </div>
                 ))}
               </div>
@@ -307,7 +338,7 @@ const ProductCatalog = () => {
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {productData.totalPages > 1 && (
               <div className="flex items-center justify-center space-x-2 mt-12">
                 <Button
                   variant="outline"
@@ -318,11 +349,11 @@ const ProductCatalog = () => {
                   Previous
                 </Button>
                 
-                {[...Array(totalPages)].map((_, index) => {
+                {[...Array(productData.totalPages)].map((_, index) => {
                   const page = index + 1;
                   if (
                     page === 1 ||
-                    page === totalPages ||
+                    page === productData.totalPages ||
                     (page >= currentPage - 1 && page <= currentPage + 1)
                   ) {
                     return (
@@ -343,8 +374,8 @@ const ProductCatalog = () => {
                 
                 <Button
                   variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, productData.totalPages))}
+                  disabled={currentPage === productData.totalPages}
                   className="hover-scale"
                 >
                   Next
